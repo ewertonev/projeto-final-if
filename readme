@@ -1,0 +1,1493 @@
+# Guia Completo de Estruturas do MySQL
+
+# 1. O que é o MySQL
+
+O MySQL é um SGBD (Sistema Gerenciador de Banco de Dados Relacional).
+
+Ele trabalha principalmente com:
+
+* tabelas
+* relações entre dados
+* consultas SQL
+* índices
+* transações
+* estruturas relacionais
+
+O MySQL utiliza SQL (Structured Query Language) como linguagem principal.
+
+---
+
+# 2. Estrutura Hierárquica do MySQL
+
+```text
+Servidor MySQL
+ ├── Databases
+ │    ├── Tabelas
+ │    │    ├── Colunas
+ │    │    ├── Índices
+ │    │    ├── Constraints
+ │    │    ├── Triggers
+ │    │    └── Dados
+ │    ├── Views
+ │    ├── Procedures
+ │    ├── Functions
+ │    └── Events
+ └── Usuários e permissões
+```
+
+---
+
+# 3. Databases (Bancos de Dados)
+
+Um database é um agrupamento lógico de tabelas e objetos.
+
+Exemplo:
+
+```sql
+CREATE DATABASE ecommerce;
+```
+
+Selecionar database:
+
+```sql
+USE ecommerce;
+```
+
+Remover:
+
+```sql
+DROP DATABASE ecommerce;
+```
+
+---
+
+# 4. Tabelas
+
+A tabela é a principal estrutura do MySQL.
+
+Ela armazena dados em linhas e colunas.
+
+Exemplo:
+
+```sql
+CREATE TABLE usuarios (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100),
+    email VARCHAR(255)
+);
+```
+
+---
+
+# Estrutura lógica
+
+```text
+usuarios
+ ├── id
+ ├── nome
+ └── email
+```
+
+---
+
+# Linhas e Colunas
+
+## Coluna
+
+Define o tipo do dado.
+
+Exemplo:
+
+```sql
+nome VARCHAR(100)
+```
+
+A coluna:
+
+* possui tipo
+* possui regras
+* pode ter índice
+* pode ter constraint
+
+---
+
+## Linha
+
+Representa um registro.
+
+Exemplo:
+
+```text
+1 | João | joao@email.com
+```
+
+---
+
+# 5. Tipos de Dados
+
+# INT
+
+Inteiros.
+
+```sql
+idade INT
+```
+
+Internamente:
+
+* ocupa 4 bytes
+* armazena números inteiros
+
+Faixa:
+
+```text
+-2147483648 até 2147483647
+```
+
+---
+
+# BIGINT
+
+Inteiros muito grandes.
+
+```sql
+cpf BIGINT
+```
+
+Ocupa 8 bytes.
+
+---
+
+# DECIMAL
+
+Usado para dinheiro.
+
+```sql
+salario DECIMAL(10,2)
+```
+
+Explicação:
+
+```text
+10 = total de dígitos
+2 = casas decimais
+```
+
+Exemplo:
+
+```text
+99999999.99
+```
+
+O DECIMAL possui precisão exata.
+
+---
+
+# FLOAT e DOUBLE
+
+Usados para cálculos aproximados.
+
+Exemplo:
+
+```sql
+temperatura FLOAT
+```
+
+Problema:
+
+```text
+Pode gerar erros de precisão.
+```
+
+Por isso:
+
+```text
+Nunca use FLOAT para dinheiro.
+```
+
+---
+
+# VARCHAR
+
+Texto de tamanho variável.
+
+```sql
+nome VARCHAR(100)
+```
+
+Internamente:
+
+* guarda apenas o necessário
+* possui tamanho máximo
+
+Exemplo:
+
+```text
+"Ana" ocupa menos espaço que "Alexandre"
+```
+
+---
+
+# CHAR
+
+Texto de tamanho fixo.
+
+```sql
+estado CHAR(2)
+```
+
+Mesmo usando:
+
+```text
+SP
+```
+
+Ele sempre reserva espaço fixo.
+
+Bom para:
+
+* siglas
+* códigos pequenos
+* dados previsíveis
+
+---
+
+# TEXT
+
+Textos grandes.
+
+```sql
+descricao TEXT
+```
+
+Usado para:
+
+* comentários
+* artigos
+* conteúdo longo
+
+---
+
+# DATE
+
+```sql
+data_nascimento DATE
+```
+
+Formato:
+
+```text
+YYYY-MM-DD
+```
+
+---
+
+# DATETIME
+
+```sql
+criado_em DATETIME
+```
+
+Armazena:
+
+* data
+* hora
+
+Formato:
+
+```text
+2026-05-20 10:30:00
+```
+
+---
+
+# TIMESTAMP
+
+Semelhante ao DATETIME.
+
+Diferença:
+
+* possui timezone interno
+* geralmente usado para auditoria
+* pode atualizar automaticamente
+
+Exemplo:
+
+```sql
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+ON UPDATE CURRENT_TIMESTAMP
+```
+
+---
+
+# BOOLEAN
+
+No MySQL:
+
+```sql
+BOOLEAN
+```
+
+vira:
+
+```sql
+TINYINT(1)
+```
+
+Valores:
+
+```text
+0 = false
+1 = true
+```
+
+---
+
+# JSON
+
+Permite armazenar estruturas JSON.
+
+```sql
+config JSON
+```
+
+Exemplo:
+
+```json
+{
+  "tema": "dark",
+  "notificacoes": true
+}
+```
+
+Consultar:
+
+```sql
+SELECT JSON_EXTRACT(config, '$.tema')
+FROM usuarios;
+```
+
+---
+
+# 6. Constraints
+
+Constraints são regras aplicadas aos dados.
+
+---
+
+# PRIMARY KEY
+
+Identificador único.
+
+```sql
+id INT PRIMARY KEY
+```
+
+Características:
+
+* único
+* não pode ser NULL
+* geralmente indexado
+* identifica registros
+
+---
+
+# AUTO_INCREMENT
+
+Incremento automático.
+
+```sql
+id INT AUTO_INCREMENT
+```
+
+Fluxo:
+
+```text
+1
+2
+3
+4
+```
+
+---
+
+# UNIQUE
+
+Impede duplicação.
+
+```sql
+email VARCHAR(255) UNIQUE
+```
+
+Não permite:
+
+```text
+email repetido
+```
+
+---
+
+# NOT NULL
+
+Impede valores nulos.
+
+```sql
+nome VARCHAR(100) NOT NULL
+```
+
+---
+
+# DEFAULT
+
+Valor padrão.
+
+```sql
+ativo BOOLEAN DEFAULT TRUE
+```
+
+---
+
+# CHECK
+
+Validação.
+
+```sql
+idade INT CHECK (idade >= 18)
+```
+
+---
+
+# FOREIGN KEY
+
+Cria relacionamento.
+
+```sql
+id_usuario INT,
+FOREIGN KEY (id_usuario)
+REFERENCES usuarios(id)
+```
+
+Isso força:
+
+```text
+pedido só pode existir se usuário existir
+```
+
+---
+
+# 7. Índices
+
+Índices aceleram buscas.
+
+Sem índice:
+
+```text
+O MySQL percorre linha por linha.
+```
+
+Com índice:
+
+```text
+O MySQL encontra diretamente.
+```
+
+---
+
+# INDEX
+
+```sql
+CREATE INDEX idx_nome
+ON usuarios(nome);
+```
+
+---
+
+# Funcionamento interno
+
+O índice funciona parecido com:
+
+```text
+índice de livro
+```
+
+Ao invés de procurar página por página:
+
+```text
+vai direto ao ponto.
+```
+
+---
+
+# B-Tree
+
+O MySQL normalmente usa B-Tree.
+
+Estrutura:
+
+```text
+        50
+      /    \
+    20      80
+   /  \    /  \
+```
+
+Busca:
+
+```text
+complexidade logarítmica
+```
+
+---
+
+# Problema de muitos índices
+
+Índices:
+
+* aceleram SELECT
+* pioram INSERT
+* pioram UPDATE
+* pioram DELETE
+
+Porque precisam ser atualizados.
+
+---
+
+# Índice composto
+
+```sql
+CREATE INDEX idx_nome_email
+ON usuarios(nome, email);
+```
+
+Ordem importa.
+
+Funciona bem para:
+
+```sql
+WHERE nome = ?
+WHERE nome = ? AND email = ?
+```
+
+Mas não:
+
+```sql
+WHERE email = ?
+```
+
+---
+
+# FULLTEXT
+
+Busca textual.
+
+```sql
+CREATE FULLTEXT INDEX idx_conteudo
+ON artigos(conteudo);
+```
+
+---
+
+# 8. Relacionamentos
+
+# 1:1
+
+```text
+usuario -> perfil
+```
+
+Um usuário possui um perfil.
+
+---
+
+# 1:N
+
+```text
+usuario -> pedidos
+```
+
+Um usuário possui vários pedidos.
+
+---
+
+# N:N
+
+```text
+usuarios <-> roles
+```
+
+Necessita tabela intermediária.
+
+```sql
+CREATE TABLE usuarios_roles (
+    id_usuario INT,
+    id_role INT
+);
+```
+
+---
+
+# 9. JOINs
+
+JOIN conecta tabelas.
+
+---
+
+# INNER JOIN
+
+Retorna apenas correspondências.
+
+```sql
+SELECT *
+FROM pedidos p
+INNER JOIN usuarios u
+ON u.id = p.id_usuario;
+```
+
+Fluxo:
+
+```text
+pedido sem usuário não aparece
+```
+
+---
+
+# LEFT JOIN
+
+Mantém tabela da esquerda.
+
+```sql
+SELECT *
+FROM usuarios u
+LEFT JOIN pedidos p
+ON p.id_usuario = u.id;
+```
+
+Mesmo sem pedido:
+
+```text
+usuário continua aparecendo
+```
+
+---
+
+# RIGHT JOIN
+
+Mantém direita.
+
+---
+
+# CROSS JOIN
+
+Produto cartesiano.
+
+```text
+3 x 5 = 15 linhas
+```
+
+---
+
+# SELF JOIN
+
+Tabela relacionada nela mesma.
+
+Exemplo:
+
+```text
+funcionário -> gerente
+```
+
+---
+
+# 10. SELECT
+
+# SELECT básico
+
+```sql
+SELECT nome
+FROM usuarios;
+```
+
+---
+
+# WHERE
+
+Filtra.
+
+```sql
+SELECT *
+FROM usuarios
+WHERE ativo = TRUE;
+```
+
+---
+
+# ORDER BY
+
+Ordena.
+
+```sql
+ORDER BY nome ASC
+```
+
+---
+
+# GROUP BY
+
+Agrupa.
+
+```sql
+SELECT cidade, COUNT(*)
+FROM usuarios
+GROUP BY cidade;
+```
+
+---
+
+# HAVING
+
+Filtra grupos.
+
+```sql
+HAVING COUNT(*) > 5
+```
+
+---
+
+# LIMIT
+
+Limita resultados.
+
+```sql
+LIMIT 10
+```
+
+---
+
+# OFFSET
+
+Pula linhas.
+
+```sql
+LIMIT 10 OFFSET 20
+```
+
+Paginação:
+
+```text
+Página 3
+```
+
+---
+
+# DISTINCT
+
+Remove duplicados.
+
+```sql
+SELECT DISTINCT cidade
+FROM usuarios;
+```
+
+---
+
+# SUBQUERY
+
+Consulta dentro de consulta.
+
+```sql
+SELECT *
+FROM usuarios
+WHERE id IN (
+    SELECT id_usuario
+    FROM pedidos
+);
+```
+
+---
+
+# EXISTS
+
+Verifica existência.
+
+```sql
+WHERE EXISTS (...)
+```
+
+Muito eficiente em vários casos.
+
+---
+
+# UNION
+
+Une resultados.
+
+```sql
+SELECT nome FROM clientes
+UNION
+SELECT nome FROM fornecedores;
+```
+
+---
+
+# CASE
+
+Condicional SQL.
+
+```sql
+CASE
+  WHEN ativo THEN 'ATIVO'
+  ELSE 'INATIVO'
+END
+```
+
+---
+
+# 11. Views
+
+Views são consultas salvas.
+
+---
+
+# Criação
+
+```sql
+CREATE VIEW vw_usuarios_ativos AS
+SELECT *
+FROM usuarios
+WHERE ativo = TRUE;
+```
+
+---
+
+# Funcionamento
+
+A view:
+
+* não armazena dados próprios
+* executa consulta ao acessar
+* simplifica queries grandes
+
+---
+
+# Uso comum
+
+* abstração
+* segurança
+* simplificação
+* reaproveitamento
+
+---
+
+# 12. Procedures
+
+Procedures são blocos executáveis.
+
+---
+
+# Exemplo
+
+```sql
+DELIMITER //
+
+CREATE PROCEDURE listarUsuarios()
+BEGIN
+    SELECT * FROM usuarios;
+END //
+
+DELIMITER ;
+```
+
+Executar:
+
+```sql
+CALL listarUsuarios();
+```
+
+---
+
+# Uso
+
+* automação
+* regras de negócio
+* processamento interno
+* batch
+
+---
+
+# 13. Functions
+
+Semelhante a procedures.
+
+Diferença:
+
+```text
+Functions retornam valor.
+```
+
+---
+
+# Exemplo
+
+```sql
+CREATE FUNCTION dobro(valor INT)
+RETURNS INT
+BEGIN
+    RETURN valor * 2;
+END
+```
+
+Uso:
+
+```sql
+SELECT dobro(10);
+```
+
+---
+
+# 14. Triggers
+
+Executam automaticamente.
+
+---
+
+# BEFORE INSERT
+
+```sql
+CREATE TRIGGER trg_nome
+BEFORE INSERT ON usuarios
+FOR EACH ROW
+SET NEW.nome = UPPER(NEW.nome);
+```
+
+---
+
+# AFTER INSERT
+
+```sql
+CREATE TRIGGER trg_log
+AFTER INSERT ON usuarios
+FOR EACH ROW
+INSERT INTO logs(msg)
+VALUES('Novo usuário');
+```
+
+---
+
+# Uso comum
+
+* auditoria
+* logs
+* validação
+* automação
+
+---
+
+# Problemas
+
+Triggers:
+
+* dificultam debug
+* escondem lógica
+* podem piorar performance
+
+---
+
+# 15. Transações
+
+Garantem consistência.
+
+---
+
+# Exemplo
+
+```sql
+START TRANSACTION;
+
+UPDATE contas
+SET saldo = saldo - 100
+WHERE id = 1;
+
+UPDATE contas
+SET saldo = saldo + 100
+WHERE id = 2;
+
+COMMIT;
+```
+
+---
+
+# Problema resolvido
+
+Sem transação:
+
+```text
+dinheiro pode sumir
+```
+
+---
+
+# ROLLBACK
+
+Desfaz.
+
+```sql
+ROLLBACK;
+```
+
+---
+
+# ACID
+
+## Atomicidade
+
+Tudo ou nada.
+
+---
+
+## Consistência
+
+Estado válido.
+
+---
+
+## Isolamento
+
+Transações independentes.
+
+---
+
+## Durabilidade
+
+Persistência após commit.
+
+---
+
+# 16. CTE
+
+CTE = Common Table Expression.
+
+---
+
+# WITH
+
+```sql
+WITH ativos AS (
+    SELECT *
+    FROM usuarios
+    WHERE ativo = TRUE
+)
+SELECT *
+FROM ativos;
+```
+
+---
+
+# Vantagens
+
+* legibilidade
+* reutilização
+* recursividade
+
+---
+
+# Recursiva
+
+```sql
+WITH RECURSIVE numeros AS (
+    SELECT 1 AS n
+    UNION ALL
+    SELECT n + 1
+    FROM numeros
+    WHERE n < 10
+)
+SELECT * FROM numeros;
+```
+
+---
+
+# 17. Window Functions
+
+Executam cálculos sem agrupar linhas.
+
+---
+
+# ROW_NUMBER
+
+```sql
+SELECT
+  nome,
+  ROW_NUMBER() OVER()
+FROM usuarios;
+```
+
+---
+
+# RANK
+
+```sql
+RANK() OVER(ORDER BY salario DESC)
+```
+
+---
+
+# PARTITION BY
+
+Divide grupos.
+
+```sql
+SUM(valor)
+OVER(PARTITION BY categoria)
+```
+
+---
+
+# 18. JSON
+
+MySQL possui suporte nativo.
+
+---
+
+# Inserção
+
+```sql
+INSERT INTO configs(config)
+VALUES('{"tema":"dark"}');
+```
+
+---
+
+# Extração
+
+```sql
+SELECT JSON_EXTRACT(config, '$.tema')
+FROM configs;
+```
+
+---
+
+# Problema do JSON
+
+JSON:
+
+* piora modelagem relacional
+* dificulta indexação
+* dificulta joins
+
+Use quando realmente necessário.
+
+---
+
+# 19. Segurança
+
+# Usuários
+
+```sql
+CREATE USER 'app'@'localhost'
+IDENTIFIED BY '123';
+```
+
+---
+
+# Permissões
+
+```sql
+GRANT SELECT, INSERT
+ON ecommerce.*
+TO 'app'@'localhost';
+```
+
+---
+
+# Revogar
+
+```sql
+REVOKE INSERT
+ON ecommerce.*
+FROM 'app'@'localhost';
+```
+
+---
+
+# 20. Engines
+
+# InnoDB
+
+Engine padrão.
+
+Possui:
+
+* transações
+* foreign keys
+* crash recovery
+* row locking
+
+---
+
+# MyISAM
+
+Antiga.
+
+Sem:
+
+* transações
+* foreign keys
+
+Hoje pouco usada.
+
+---
+
+# 21. Modelagem Relacional
+
+Boa modelagem evita:
+
+* redundância
+* inconsistência
+* duplicação
+
+---
+
+# Normalização
+
+## 1FN
+
+Sem listas dentro de colunas.
+
+Errado:
+
+```text
+telefones = "111,222"
+```
+
+---
+
+## 2FN
+
+Dependência total da chave.
+
+---
+
+## 3FN
+
+Sem dependências transitivas.
+
+---
+
+# Exemplo correto
+
+```text
+usuarios
+pedidos
+itens_pedido
+produtos
+```
+
+---
+
+# 22. Performance
+
+# EXPLAIN
+
+Mostra plano de execução.
+
+```sql
+EXPLAIN SELECT *
+FROM usuarios
+WHERE email = 'a@a.com';
+```
+
+---
+
+# Full table scan
+
+Sem índice:
+
+```text
+varredura completa
+```
+
+Muito lento.
+
+---
+
+# Index scan
+
+Com índice:
+
+```text
+busca otimizada
+```
+
+---
+
+# Problemas comuns
+
+* SELECT * excessivo
+* índices demais
+* joins ruins
+* subqueries ruins
+* tipos errados
+* falta de paginação
+
+---
+
+# 23. Fluxo real de uma aplicação
+
+```text
+Frontend
+   ↓
+API
+   ↓
+Service
+   ↓
+DAO/Repository
+   ↓
+MySQL
+```
+
+---
+
+# Exemplo real
+
+```text
+Usuário cria pedido
+   ↓
+API recebe
+   ↓
+Service valida estoque
+   ↓
+Transaction inicia
+   ↓
+Pedido inserido
+   ↓
+Estoque atualizado
+   ↓
+COMMIT
+```
+
+---
+
+# 24. Ordem real de execução SQL
+
+Mesmo escrevendo:
+
+```sql
+SELECT
+FROM
+WHERE
+GROUP BY
+```
+
+O MySQL executa assim:
+
+```text
+FROM
+JOIN
+WHERE
+GROUP BY
+HAVING
+SELECT
+ORDER BY
+LIMIT
+```
+
+Isso é extremamente importante para:
+
+* performance
+* aliases
+* agregações
+* entendimento interno
+
+---
+
+# 25. Estrutura de Banco Profissional
+
+Exemplo:
+
+```text
+usuarios
+ ├── perfis
+ ├── enderecos
+ ├── pedidos
+ │    ├── itens_pedido
+ │    └── pagamentos
+ └── logs
+```
+
+---
+
+# 26. Conceitos Avançados
+
+# Lock
+
+Bloqueio de registros.
+
+---
+
+# Deadlock
+
+Duas transações esperando uma pela outra.
+
+---
+
+# Isolation Levels
+
+* READ UNCOMMITTED
+* READ COMMITTED
+* REPEATABLE READ
+* SERIALIZABLE
+
+---
+
+# Replicação
+
+Banco principal e réplicas.
+
+---
+
+# Sharding
+
+Divisão horizontal dos dados.
+
+---
+
+# Pool de conexões
+
+Reaproveitamento de conexões.
+
+---
+
+# Conclusão
+
+O MySQL não é apenas:
+
+```text
+uma coleção de tabelas
+```
+
+Ele é:
+
+* mecanismo relacional
+* sistema transacional
+* motor de indexação
+* sistema concorrente
+* engine de consultas
+* plataforma programável
+
+As estruturas principais se conectam assim:
+
+```text
+Tabelas
+ ├── Colunas
+ ├── Tipos
+ ├── Constraints
+ ├── Índices
+ └── Relacionamentos
+        ↓
+      JOINs
+        ↓
+     Consultas
+        ↓
+     Views / Procedures / Functions
+        ↓
+      Aplicação
+```
