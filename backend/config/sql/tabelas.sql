@@ -1,16 +1,16 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP TABLE IF EXISTS papeis;
-DROP TABLE IF EXISTS hospedes;
+DROP TABLE IF EXISTS consumos;
+DROP TABLE IF EXISTS formas_pagamento;
 DROP TABLE IF EXISTS funcionarios;
 DROP TABLE IF EXISTS funcionarios_papeis;
-DROP TABLE IF EXISTS tipos_quartos;
+DROP TABLE IF EXISTS hospedes;
+DROP TABLE IF EXISTS pagamentos;
+DROP TABLE IF EXISTS papeis;
 DROP TABLE IF EXISTS quartos;
 DROP TABLE IF EXISTS reservas;
-DROP TABLE IF EXISTS formas_pagamento;
-DROP TABLE IF EXISTS pagamentos;
 DROP TABLE IF EXISTS servicos;
-DROP TABLE IF EXISTS consumos;
+DROP TABLE IF EXISTS tipos_quartos;
 
 
 CREATE TABLE IF NOT EXISTS papeis (

@@ -100,7 +100,7 @@ export class ReservaDao extends BaseDao {
         const [rows] = await this.DB.execute(sql, params);
 
         if (tipo === 'id') {
-            return rows;
+            return rows[0];
         }
 
         return rows;
