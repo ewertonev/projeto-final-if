@@ -92,4 +92,13 @@ export class ReservasService {
 		id = inteiroPositivo(id, 'ID');
 		return this.dao.deleteReserva(id);
 	}
+
+	async detalhar(id) {
+		id = inteiroPositivo(id, 'ID');
+		return await this.dao.getReserva({
+			tipo: 'id',
+			valor: id,
+		});
+	}
+
 }

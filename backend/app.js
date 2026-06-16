@@ -10,6 +10,15 @@ app.use(express.json());
 
 app.use(routes);
 
+// Middleware global de erro
+app.use((err, req, res, next) => {
+    console.error(err);
+    res.status(err.status || 400).json({
+        sucesso: false,
+        mensagem: err.message || 'Erro interno do servidor'
+    });
+});
+
 app.listen(8080, () => {
     console.log('Servidor rodando em http://localhost:8080');
 });
