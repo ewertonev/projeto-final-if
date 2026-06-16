@@ -123,6 +123,50 @@
         </table>
     </div>
 
+    <div id="modalQuarto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            <h2 style="margin-top: 0; color: #2d2a5e;">Cadastrar Novo Quarto</h2>
+            
+            <form id="formQuarto">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Número do Quarto:</label>
+                    <input type="number" id="numQuarto" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Tipo:</label>
+                    <select id="tipoQuarto" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="Standard">Standard</option>
+                        <option value="Luxo">Luxo</option>
+                        <option value="Premium">Premium</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Status Inicial:</label>
+                    <select id="statusQuarto" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="Disponível">Disponível</option>
+                        <option value="Ocupado">Ocupado</option>
+                        <option value="Manutenção">Manutenção</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Valor da Diária (R$):</label>
+                    <input type="number" step="0.01" id="valorQuarto" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+                </div>
+
+                <div style="display: flex; justify-content: space-between;">
+                    <button type="button" id="btnFecharModal" style="background: #ccc; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Cancelar</button>
+                    <button type="submit" style="background: #2d2a5e; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Salvar Quarto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector(".topo .btn").id = "btnNovoQuarto";
+    </script>
     <script src="../js/quartos.js"></script>
 </body>
 </html>

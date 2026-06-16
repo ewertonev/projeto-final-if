@@ -97,3 +97,5 @@ routes.get(
 routes.post('/consumos', ConsumosController.criar);
 routes.put('/consumos/:id', ConsumosController.atualizar);
 routes.delete('/consumos/:id', ConsumosController.deletar);
+
+import pool from '../../config/conexao.js';

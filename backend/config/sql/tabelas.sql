@@ -18,6 +18,11 @@ CREATE TABLE IF NOT EXISTS papeis (
   nome VARCHAR(100) UNIQUE NOT NULL
 );
 
+INSERT INTO tipos_quartos (id, nome, descricao, capacity, valor_diaria, ativo) VALUES 
+(1, 'Standard', 'Quarto padrão confortável', 2, 100.00, 1),
+(2, 'Luxo', 'Quarto luxo com vista e hidromassagem', 3, 150.00, 1),
+(3, 'Premium', 'Suíte master premium com tudo incluso', 4, 250.00, 1);
+
 CREATE TABLE IF NOT EXISTS funcionarios (
   id INT PRIMARY KEY AUTO_INCREMENT,
   nome VARCHAR(100) NOT NULL,
