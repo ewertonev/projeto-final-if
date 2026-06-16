@@ -2,7 +2,6 @@ import { TipoQuartoDao } from '../repository/tiposQuartosDao.js';
 import {
 	inteiroPositivo,
 	numeroPositivo,
-	stringObrigatoria,
 } from '../validators/numeros.js';
 import { stringObrigatoria } from '../validators/textos.js';
 

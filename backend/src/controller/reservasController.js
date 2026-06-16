@@ -1,4 +1,4 @@
-import { ReservasService } from '../services/reservasService.js';
+import { ReservasService } from '../services/reservasServices.js';
 
 const service = new ReservasService();
 

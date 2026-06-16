@@ -1,4 +1,4 @@
-import { PapeisService } from '../services/papeisService.js';
+import { PapeisService } from '../services/papeisServices.js';
 
 const service = new PapeisService();
 

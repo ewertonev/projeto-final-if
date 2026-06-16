@@ -1,16 +1,15 @@
 import { Router } from 'express';
 
-import { HospedesController } from './controllers/hospedesController.js';
-import { TiposQuartosController } from './controllers/tiposQuartosController.js';
-import { QuartosController } from './controllers/quartosController.js';
-import { FuncionariosController } from './controllers/funcionariosController.js';
-import { FormasPagamentoController } from './controllers/formasPagamentoController.js';
-import { PapeisController } from './controllers/papeisController.js';
-import { ServicosController } from './controllers/servicosController.js';
-import { ConsumosController } from './controllers/consumosController.js';
-import { PagamentosController } from './controllers/pagamentosController.js';
-import { ReservasController } from './controllers/reservasController.js';
-
+import { HospedesController } from '../controller/hospedesController.js';
+import { TiposQuartosController } from '../controller/tiposQuartosController.js';
+import { QuartosController } from '../controller/quartosController.js';
+import { FuncionariosController } from '../controller/funcionariosController.js';
+import { FormasPagamentoController } from '../controller/formasPagamentoController.js';
+import { PapeisController } from '../controller/papeisController.js';
+import { ServicosController } from '../controller/servicosController.js';
+import { ConsumosController } from '../controller/consumosController.js';
+import { PagamentosController } from '../controller/pagamentosController.js';
+import { ReservasController } from '../controller/reservasController.js';
 export const routes = Router();
 
 routes.get('/', (req, res) => {

@@ -1,4 +1,4 @@
-import { QuartosService } from '../services/quartosService.js';
+import { QuartosService } from '../services/quartosServices.js';
 
 const service = new QuartosService();
 

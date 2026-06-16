@@ -1,4 +1,4 @@
-import { PagamentosService } from '../services/pagamentosService.js';
+import { PagamentosService } from '../services/pagamentosServices.js';
 
 const service = new PagamentosService();
 

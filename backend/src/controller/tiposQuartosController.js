@@ -1,4 +1,4 @@
-import { TiposQuartosService } from '../services/tiposQuartosService.js';
+import { TiposQuartosService } from '../services/tiposQuartosServices.js';
 
 const service = new TiposQuartosService();
 

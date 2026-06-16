@@ -1,6 +1,6 @@
-import { FormasPagamentoService } from '../services/formasPagamentoService.js';
+import { FormasPagamentosService } from '../services/formasPagamentosServices.js';
 
-const service = new FormasPagamentoService();
+const service = new FormasPagamentosService();
 
 export class FormasPagamentoController {
 	static async listar(req, res, next) {

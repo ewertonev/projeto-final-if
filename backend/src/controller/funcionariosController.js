@@ -1,4 +1,4 @@
-import { FuncionariosService } from '../services/funcionariosService.js';
+import { FuncionariosService } from '../services/funcionariosServices.js';
 
 const service = new FuncionariosService();
 

@@ -1,4 +1,4 @@
-import { ServicosService } from '../services/servicosService.js';
+import { ServicosService } from '../services/servicosServices.js';
 
 const service = new ServicosService();
 
