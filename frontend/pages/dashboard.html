@@ -2,13 +2,15 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard - Hotel </title>
+    <title>Dashboard - Hotel</title>
 
     <link rel="stylesheet" href="../css/style.css">
 
     <style>
         body{
             display:flex;
+            margin: 0;
+            font-family: sans-serif;
         }
 
         .sidebar{
@@ -33,6 +35,10 @@
         }
 
         .menu a:hover{
+            background:#403c7d;
+        }
+
+        .ativo {
             background:#403c7d;
         }
 
@@ -66,12 +72,15 @@
             padding:20px;
             border-radius:10px;
             box-shadow:0 0 5px rgba(0,0,0,.1);
+            color: #555;
+            font-weight: bold;
         }
 
         .numero{
-            font-size:28px;
+            font-size:32px; 
             font-weight:bold;
             margin-top:10px;
+            color: #2d2a5e;
         }
     </style>
 </head>
@@ -85,7 +94,7 @@
     </div>
 
     <div class="menu">
-        <a href="dashboard.html">Dashboard</a>
+        <a href="dashboard.html" class="ativo">Dashboard</a>
         <a href="reservas.html">Reservas</a>
         <a href="hospedes.html">Hóspedes</a>
         <a href="quartos.html">Quartos</a>
@@ -99,7 +108,7 @@
 <div class="conteudo">
 
     <div class="topo">
-        <h1 id="boasVindas"></h1>
+        <h1 id="boasVindas">Carregando...</h1>
 
         <div class="perfil">
             Perfil
@@ -110,17 +119,17 @@
 
         <div class="card-info">
             Reservas
-            <div class="numero"></div>
+            <div class="numero" id="totalReservas">0</div>
         </div>
 
         <div class="card-info">
             Hóspedes
-            <div class="numero"></div>
+            <div class="numero" id="totalHospedes">0</div>
         </div>
 
         <div class="card-info">
             Quartos Livres
-            <div class="numero"></div>
+            <div class="numero" id="totalQuartosLivres">0</div>
         </div>
 
     </div>

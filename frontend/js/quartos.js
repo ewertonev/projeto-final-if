@@ -1,6 +1,6 @@
 const API = "http://localhost:8080";
 
-// --- 1. FUNÇÃO PARA CARREGAR OS QUARTOS (GET) ---
+
 async function carregarQuartos() {
     try {
         const resposta = await fetch(`${API}/quartos`);
@@ -19,7 +19,7 @@ async function carregarQuartos() {
         let manutencao = 0;
 
         quartos.forEach(quarto => {
-            // Ajustado para checar as propriedades reais retornadas pelo banco
+          
             const status = quarto.estado ? quarto.estado.toLowerCase() : "";
             if (status === "disponível" || status === "disponivel") disponiveis++;
             else if (status === "ocupado") ocupados++;

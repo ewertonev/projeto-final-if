@@ -39,6 +39,7 @@
         .btn {
             width: auto;
             padding: 10px 15px;
+            cursor: pointer;
         }
         table {
             width: 100%;
@@ -53,6 +54,31 @@
             background: #eee;
             text-align: left;
         }
+
+        /* ESTILOS DO MODAL (IGUAL AO DE QUARTOS) */
+        .modal {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .modal-conteudo {
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            width: 400px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .modal-conteudo h2 { margin-top: 0; color: #2d2a5e; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .botoes-modal { display: flex; justify-content: space-between; margin-top: 20px; }
+        .btn-cancelar { background: #ccc; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+        .btn-salvar { background: #2d2a5e; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -73,23 +99,56 @@
     <div class="conteudo">
         <div class="topo">
             <h1>Hóspedes</h1>
-            <button class="btn">Novo Hóspede</button>
+            <button class="btn" id="btnNovoHospede">Novo Hóspede</button>
         </div>
 
         <table>
             <thead>
                 <tr>
                     <th>Nome</th>
-                    <th>Telefone</th>
                     <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Nascimento</th>
                 </tr>
             </thead>
             <tbody id="tabelaHospedes">
                 <tr>
-                    <td colspan="3">Carregando hóspedes...</td>
+                    <td colspan="4">Carregando hóspedes...</td>
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <div id="modalHospede" class="modal">
+        <div class="modal-conteudo">
+            <h2>Cadastrar NOVO Hóspede</h2>
+            <form id="formHospede">
+                <div class="form-group">
+                    <label for="nomeHospede">Nome Completo:</label>
+                    <input type="text" id="nomeHospede" required placeholder="Ex: João Silva">
+                </div>
+                
+                <div class="form-group">
+                    <label for="emailHospede">E-mail:</label>
+                    <input type="email" id="emailHospede" placeholder="Ex: joao@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="telefoneHospede">Telefone:</label>
+                    <input type="text" id="telefoneHospede" placeholder="Ex: 82999998888">
+                </div>
+
+                <div class="form-group">
+                    <label for="dataNascimentoHospede">Data de Nascimento:</label>
+                    <input type="date" id="dataNascimentoHospede" required>
+                </div>
+
+                <div class="botoes-modal">
+                    <button type="button" class="btn-cancelar" id="btnFecharModal">Cancelar</button>
+                    <button type="submit" class="btn-salvar">Salvar Hóspede</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="../js/hospedes.js"></script>
