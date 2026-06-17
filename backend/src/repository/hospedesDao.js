@@ -138,17 +138,3 @@ export class HospedeDao extends BaseDao {
         return result.affectedRows > 0;
     }
 }
-
-// export class HospedeDao {}
-
-
- // let nu = new HospedeDao();
-// await nu.setHospede({
-//     nome: 'josé',
-//     email: 'jose@gmail.com',
-//     telefone: '00000000001',
-//     senha: '12345',
-//     data_nascimento: '2008-12-13',
-//     papeis: [1, 2, 3],
-// });
-// console.log(await nu.gethospedes());

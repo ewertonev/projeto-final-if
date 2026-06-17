@@ -17,6 +17,23 @@ export class PagamentoDao extends BaseDao {
 		return rows;
 	}
 
+	async getPagamentosPorReserva(idReserva) {
+		const sql = `
+            SELECT
+                p.*,
+                fp.nome AS forma_pagamento_nome
+            FROM pagamentos AS p
+
+            INNER JOIN formas_pagamento AS fp
+                ON fp.id = p.forma_pagamento
+
+            WHERE p.id_reserva = ?
+        `;
+
+		const [rows] = await this.DB.execute(sql, [idReserva]);
+		return rows;
+	}
+
 	async getPagamento(consulta) {
 		const { tipo, valor } = consulta;
 

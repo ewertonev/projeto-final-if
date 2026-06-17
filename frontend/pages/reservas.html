@@ -1,121 +1,101 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Reservas - Hotel Prime</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <style>
-        body { display: flex; font-family: sans-serif; margin: 0; }
-        .sidebar { width: 220px; min-height: 100vh; background: #2d2a5e; }
-        .logo-menu { color: white; padding: 20px; text-align: center; font-size: 22px; font-weight: bold; }
-        .menu a { display: block; padding: 15px 20px; color: white; text-decoration: none; }
-        .menu a:hover { background: #403c7d; }
-        .ativo { background: #403c7d; }
-        .conteudo { flex: 1; padding: 30px; background: #f5f5f5; }
-        .topo { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .btn { width: auto; padding: 10px 15px; cursor: pointer; }
-        table { width: 100%; background: white; border-collapse: collapse; }
-        th, td { padding: 12px; border-bottom: 1px solid #ddd; }
-        th { background: #eee; text-align: left; }
-        
-        /* MODAL */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-conteudo { background: white; padding: 30px; border-radius: 10px; width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .modal-conteudo h2 { margin-top: 0; color: #2d2a5e; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .botoes-modal { display: flex; justify-content: space-between; margin-top: 20px; }
-        .btn-cancelar { background: #ccc; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
-        .btn-salvar { background: #2d2a5e; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
-        
-        /* Cores rápidas para status */
-        .status-confirmada { color: green; font-weight: bold; }
-        .status-finalizada { color: blue; }
-        .status-cancelada { color: red; }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Reservas - Hotel Prime</title>
+	<link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
+	<div class="layout">
+		<aside class="sidebar">
+			<div class="logo-menu">Hotel Prime</div>
+			<nav class="menu">
+				<a href="dashboard.html">Dashboard</a>
+				<a href="reservas.html" class="ativo">Reservas</a>
+				<a href="hospedes.html">Hóspedes</a>
+				<a href="quartos.html">Quartos</a>
+				<a href="financeiro.html">Financeiro</a>
+				<a href="funcionarios.html">Funcionários</a>
+				<button type="button" onclick="sair()">Sair</button>
+			</nav>
+		</aside>
 
-    <div class="sidebar">
-        <div class="logo-menu">Hotel</div>
-        <div class="menu">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="reservas.html" class="ativo">Reservas</a>
-            <a href="hospedes.html">Hóspedes</a>
-            <a href="quartos.html">Quartos</a>
-            <a href="funcionarios.html">Funcionários</a>
-            <a href="servicos.html">Serviços</a>
-            <a href="financeiro.html">Financeiro</a>
-        </div>
-    </div>
+		<main class="conteudo">
+			<div class="topo">
+				<h1>Reservas</h1>
+				<button class="btn" id="btnNovaReserva">Nova Reserva</button>
+			</div>
 
-    <div class="conteudo">
-        <div class="topo">
-            <h1>Reservas</h1>
-            <button class="btn" id="btnNovaReserva">Nova Reserva</button>
-        </div>
+			<table>
+				<thead>
+					<tr>
+						<th>Hóspede</th>
+						<th>Quarto</th>
+						<th>Check-in</th>
+						<th>Check-out</th>
+						<th>Qtd.</th>
+						<th>Status</th>
+						<th>Ações</th>
+					</tr>
+				</thead>
+				<tbody id="tabelaReservas">
+					<tr><td colspan="7">Carregando reservas...</td></tr>
+				</tbody>
+			</table>
+		</main>
+	</div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Hóspede</th>
-                    <th>Quarto</th>
-                    <th>Check-in (Início)</th>
-                    <th>Check-out (Fim)</th>
-                    <th>Hóspedes</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="tabelaReservas">
-                <tr>
-                    <td colspan="6">Carregando listagem de reservas...</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+	<div id="modalReserva" class="modal">
+		<div class="modal-conteudo">
+			<h2 id="tituloModalReserva">Criar Reserva</h2>
+			<form id="formReserva">
+				<input type="hidden" id="idReserva">
 
-    <div id="modalReserva" class="modal">
-        <div class="modal-conteudo">
-            <h2>Criar Nova Reserva</h2>
-            <form id="formReserva">
-                <div class="form-group">
-                    <label for="selectHospede">Hóspede:</label>
-                    <select id="selectHospede" required>
-                        <option value="">Carregando hóspedes...</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="selectQuarto">Quarto Disponível:</label>
-                    <select id="selectQuarto" required>
-                        <option value="">Carregando quartos disponíveis...</option>
-                    </select>
-                </div>
+				<div class="form-group">
+					<label for="selectHospede">Hóspede</label>
+					<select id="selectHospede" required></select>
+				</div>
 
-                <div class="form-group">
-                    <label for="dataInicio">Data de Check-in:</label>
-                    <input type="date" id="dataInicio" required>
-                </div>
+				<div class="form-group">
+					<label for="selectQuarto">Quarto</label>
+					<select id="selectQuarto" required></select>
+				</div>
 
-                <div class="form-group">
-                    <label for="dataFim">Data de Check-out:</label>
-                    <input type="date" id="dataFim" required>
-                </div>
+				<div class="form-group">
+					<label for="dataInicio">Check-in</label>
+					<input type="date" id="dataInicio" required>
+				</div>
 
-                <div class="form-group">
-                    <label for="qtdHospedes">Quantidade de Pessoas:</label>
-                    <input type="number" id="qtdHospedes" min="1" value="1" required>
-                </div>
+				<div class="form-group">
+					<label for="dataFim">Check-out</label>
+					<input type="date" id="dataFim" required>
+				</div>
 
-                <div class="botoes-modal">
-                    <button type="button" class="btn-cancelar" id="btnFecharModal">Cancelar</button>
-                    <button type="submit" class="btn-salvar">Confirmar Reserva</button>
-                </div>
-            </form>
-        </div>
-    </div>
+				<div class="form-group">
+					<label for="qtdHospedes">Quantidade de hóspedes</label>
+					<input type="number" id="qtdHospedes" min="1" value="1" required>
+				</div>
 
-    <script src="../js/reservas.js"></script>
+				<div class="form-group">
+					<label for="estadoReserva">Estado</label>
+					<select id="estadoReserva" required>
+						<option value="confirmada">Confirmada</option>
+						<option value="finalizada">Finalizada</option>
+						<option value="cancelada">Cancelada</option>
+						<option value="faltou">Faltou</option>
+					</select>
+				</div>
+
+				<div class="botoes-modal">
+					<button type="button" class="btn-cancelar" id="btnFecharModalReserva">Cancelar</button>
+					<button type="submit" class="btn-salvar">Salvar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script src="../js/api.js"></script>
+	<script src="../js/reservas.js"></script>
 </body>
 </html>

@@ -1,14 +1,14 @@
-import { BaseDao } from './baseDao';
+import { BaseDao } from './baseDao.js';
 export class ConsultasQuartos extends BaseDao {
 	async getQuartosComReservasAPartirDe(data = {}) {
 		const filtros = [];
-		const valores = [];
+		const valoresFiltro = [];
 
 		const dataBase = data.data_base ?? new Date();
 
 		if (data.id_tipo_quarto !== undefined) {
 			filtros.push('AND q.id_tipo_quarto = ?');
-			valores.push(data.id_tipo_quarto);
+			valoresFiltro.push(data.id_tipo_quarto);
 		}
 
 		const sql = `
@@ -54,7 +54,7 @@ export class ConsultasQuartos extends BaseDao {
 		ORDER BY q.id, r.inicio
 	`;
 
-		valores.unshift(dataBase, dataBase, dataBase);
+		const valores = [dataBase, ...valoresFiltro, dataBase, dataBase];
 
 		const [rows] = await this.DB.execute(sql, valores);
 		return rows;

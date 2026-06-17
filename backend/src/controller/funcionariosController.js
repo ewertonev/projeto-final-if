@@ -45,19 +45,6 @@ export class FuncionariosController {
 		}
 	}
 
-	static async atualizarPapeis(req, res, next) {
-		try {
-			const ok = await service.atualizarPapeis(
-				req.params.id,
-				req.body.papeis,
-			);
-
-			res.json({ atualizado: ok });
-		} catch (error) {
-			next(error);
-		}
-	}
-
 	static async deletar(req, res, next) {
 		try {
 			const ok = await service.deletar(req.params.id);

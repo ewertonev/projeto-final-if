@@ -1,133 +1,137 @@
-const API = "http://localhost:8080";
+let quartos = [];
+let tiposQuartos = [];
 
-
-async function carregarQuartos() {
-    try {
-        const resposta = await fetch(`${API}/quartos`);
-        
-        if (!resposta.ok) {
-            throw new Error("Erro ao buscar dados do servidor.");
-        }
-
-        const quartos = await resposta.json();
-        const tabela = document.getElementById("tabelaQuartos");
-        
-        tabela.innerHTML = "";
-
-        let disponiveis = 0;
-        let ocupados = 0;
-        let manutencao = 0;
-
-        quartos.forEach(quarto => {
-          
-            const status = quarto.estado ? quarto.estado.toLowerCase() : "";
-            if (status === "disponível" || status === "disponivel") disponiveis++;
-            else if (status === "ocupado") ocupados++;
-            else if (status === "manutenção" || status === "manutencao") manutencao++;
-
-            // Se o backend não trouxer o nome do tipo ou valor diretamente, 
-            // colocamos um fallback para não quebrar a tabela
-            const tipoQuarto = quarto.tipo || (quarto.id_tipo_quarto == 2 ? "Luxo" : quarto.id_tipo_quarto == 3 ? "Premium" : "Standard");
-            const valorDiaria = quarto.valor_diaria ? Number(quarto.valor_diaria).toFixed(2) : "0.00";
-
-            tabela.innerHTML += `
-                <tr>
-                    <td>${quarto.numero}</td>
-                    <td>${tipoQuarto}</td>
-                    <td>${quarto.estado || "disponivel"}</td>
-                    <td>R$ ${valorDiaria}</td>
-                </tr>
-            `;
-        });
-
-        document.getElementById("cardDisponiveis").innerText = disponiveis;
-        document.getElementById("cardOcupados").innerText = ocupados;
-        document.getElementById("cardManutencao").innerText = manutencao;
-
-    } catch (erro) {
-        console.error("Erro na comunicação GET:", erro);
-        document.getElementById("tabelaQuartos").innerHTML = `
-            <tr>
-                <td colspan="4" style="color: red; text-align: center;">
-                    Não foi possível carregar a lista de quartos.
-                </td>
-            </tr>
-        `;
-    }
+function limparFormularioQuarto() {
+	document.getElementById('formQuarto').reset();
+	document.getElementById('idQuarto').value = '';
+	document.getElementById('estadoQuarto').value = 'disponivel';
+	document.getElementById('tituloModalQuarto').innerText = 'Cadastrar Quarto';
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    
-    carregarQuartos();
+async function carregarTiposQuartos() {
+	tiposQuartos = await api('/tipos-quartos?ativos=true');
+	const select = document.getElementById('tipoQuarto');
+	select.innerHTML = tiposQuartos.map((tipo) => `
+		<option value="${tipo.id}">${escaparHtml(tipo.nome)} - ${dinheiro(tipo.valor_diaria)}</option>
+	`).join('');
+}
 
-    const modal = document.getElementById("modalQuarto");
-    const btnNovoQuarto = document.getElementById("btnNovoQuarto");
-    const btnFecharModal = document.getElementById("btnFecharModal");
-    const formQuarto = document.getElementById("formQuarto");
+async function carregarQuartos() {
+	const tabela = document.getElementById('tabelaQuartos');
 
-    if (btnNovoQuarto && modal) {
-        btnNovoQuarto.addEventListener("click", () => {
-            modal.style.display = "flex";
-        });
-    } else {
-        console.error("Erro: O botão ou o modal de quartos não foi encontrado no HTML.");
-    }
+	try {
+		quartos = await api('/quartos');
 
-    if (btnFecharModal && modal) {
-        btnFecharModal.addEventListener("click", () => {
-            modal.style.display = "none";
-            formQuarto.reset();
-        });
-    }
+		const disponiveis = quartos.filter((q) => q.estado === 'disponivel').length;
+		const limpeza = quartos.filter((q) => q.estado === 'limpeza').length;
+		const manutencao = quartos.filter((q) => q.estado === 'manutencao').length;
 
-    if (formQuarto) {
-        formQuarto.addEventListener("submit", async (e) => {
-            e.preventDefault();
+		document.getElementById('cardDisponiveis').innerText = disponiveis;
+		document.getElementById('cardLimpeza').innerText = limpeza;
+		document.getElementById('cardManutencao').innerText = manutencao;
 
-            const numeroQuarto = document.getElementById("numQuarto").value;
-            
-            const andarCalculado = parseInt(Number(numeroQuarto) / 100, 10) || 1;
+		if (quartos.length === 0) {
+			tabela.innerHTML = '<tr><td colspan="6">Nenhum quarto cadastrado.</td></tr>';
+			return;
+		}
 
-            let idTipoQuarto = 1; 
-            const tipoSelecionado = document.getElementById("tipoQuarto").value;
-            if (tipoSelecionado === "Luxo") idTipoQuarto = 2;
-            if (tipoSelecionado === "Premium") idTipoQuarto = 3;
+		tabela.innerHTML = quartos.map((quarto) => `
+			<tr>
+				<td>${escaparHtml(quarto.numero)}</td>
+				<td>${escaparHtml(quarto.andar)}</td>
+				<td>${escaparHtml(quarto.tipo_quarto)}</td>
+				<td><span class="status-${quarto.estado}">${escaparHtml(quarto.estado)}</span></td>
+				<td>${dinheiro(quarto.valor_diaria)}</td>
+				<td>
+					<div class="acoes">
+						<button type="button" class="btn-secundario" data-editar="${quarto.id}">Editar</button>
+						<button type="button" class="btn-perigo" data-excluir="${quarto.id}">Excluir</button>
+					</div>
+				</td>
+			</tr>
+		`).join('');
+	} catch (erro) {
+		console.error(erro);
+		tabela.innerHTML = '<tr><td colspan="6" style="color: red;">Não foi possível carregar os quartos.</td></tr>';
+	}
+}
 
-            let estadoFormatado = "disponivel";
-            const statusSelecionado = document.getElementById("statusQuarto").value;
-            if (statusSelecionado === "Manutenção" || statusSelecionado === "manutencao") {
-                estadoFormatado = "manutencao";
-            }
+function editarQuarto(id) {
+	const quarto = quartos.find((item) => Number(item.id) === Number(id));
+	if (!quarto) return;
 
-            const dadosQuarto = {
-                numero: numeroQuarto,
-                andar: andarCalculado,
-                id_tipo_quarto: idTipoQuarto,
-                estado: estadoFormatado,
-                valor_diaria: document.getElementById("valorQuarto").value
-            };
+	document.getElementById('idQuarto').value = quarto.id;
+	document.getElementById('numeroQuarto').value = quarto.numero || '';
+	document.getElementById('andarQuarto').value = quarto.andar || '';
+	document.getElementById('tipoQuarto').value = quarto.id_tipo_quarto;
+	document.getElementById('estadoQuarto').value = quarto.estado || 'disponivel';
+	document.getElementById('tituloModalQuarto').innerText = 'Editar Quarto';
+	abrirModal('modalQuarto');
+}
 
-            try {
-                const resposta = await fetch(`${API}/quartos`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(dadosQuarto)
-                });
+async function excluirQuarto(id) {
+	if (!confirm('Deseja excluir este quarto?')) return;
 
-                if (resposta.ok) {
-                    alert("Quarto cadastrado com sucesso!");
-                    modal.style.display = "none";
-                    formQuarto.reset();
-                    carregarQuartos();
-                } else {
-                    alert("Erro ao salvar o quarto no servidor.");
-                }
-            } catch (erro) {
-                console.error("Erro na comunicação POST:", erro);
-                alert("Não foi possível conectar ao backend.");
-            }
-        });
-    }
+	try {
+		await api(`/quartos/${id}`, { method: 'DELETE' });
+		await carregarQuartos();
+	} catch (erro) {
+		alert(erro.message);
+	}
+}
+
+async function salvarQuarto(evento) {
+	evento.preventDefault();
+
+	const id = document.getElementById('idQuarto').value;
+	const dados = {
+		numero: document.getElementById('numeroQuarto').value.trim(),
+		andar: Number(document.getElementById('andarQuarto').value),
+		id_tipo_quarto: Number(document.getElementById('tipoQuarto').value),
+		estado: document.getElementById('estadoQuarto').value,
+	};
+
+	try {
+		if (id) {
+			await enviarJson(`/quartos/${id}`, 'PUT', dados);
+		} else {
+			await enviarJson('/quartos', 'POST', dados);
+		}
+
+		fecharModal('modalQuarto');
+		limparFormularioQuarto();
+		await carregarQuartos();
+	} catch (erro) {
+		alert(erro.message);
+	}
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+	try {
+		await carregarTiposQuartos();
+	} catch (erro) {
+		alert('Não foi possível carregar os tipos de quarto. Inicialize o banco antes de cadastrar quartos.');
+	}
+
+	carregarQuartos();
+
+	document.getElementById('btnNovoQuarto').addEventListener('click', () => {
+		limparFormularioQuarto();
+		abrirModal('modalQuarto');
+	});
+
+	document.getElementById('btnFecharModalQuarto').addEventListener('click', () => {
+		fecharModal('modalQuarto');
+		limparFormularioQuarto();
+	});
+
+	document.getElementById('formQuarto').addEventListener('submit', salvarQuarto);
+
+	document.getElementById('tabelaQuartos').addEventListener('click', (evento) => {
+		const editar = evento.target.dataset.editar;
+		const excluir = evento.target.dataset.excluir;
+
+		if (editar) editarQuarto(editar);
+		if (excluir) excluirQuarto(excluir);
+	});
 });

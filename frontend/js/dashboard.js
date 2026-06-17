@@ -1,60 +1,40 @@
-const API = "http://localhost:8080";
-
 async function carregarDadosDashboard() {
-    try {
-        const [resReservas, resHospedes, resQuartos] = await Promise.all([
-            fetch(`${API}/reservas`),
-            fetch(`${API}/hospedes`),
-            fetch(`${API}/quartos`)
-        ]);
+	try {
+		const [reservas, hospedes, quartos, funcionarios, pagamentos] = await Promise.all([
+			api('/reservas'),
+			api('/hospedes'),
+			api('/quartos'),
+			api('/funcionarios'),
+			api('/pagamentos').catch(() => []),
+		]);
 
-        if (resReservas.ok) {
-            const reservas = await resReservas.json();
-            document.getElementById("totalReservas").innerText = reservas.length;
-        } else {
-            document.getElementById("totalReservas").innerText = "---";
-        }
+		const quartosLivres = quartos.filter((q) => q.estado === 'disponivel');
+		const pagamentosPagos = pagamentos.filter((p) => p.estado === 'pago');
+		const totalRecebido = pagamentosPagos.reduce((soma, p) => soma + Number(p.valor || 0), 0);
 
-        if (resHospedes.ok) {
-            const hospedes = await resHospedes.json();
-            document.getElementById("totalHospedes").innerText = hospedes.length;
-        } else {
-            document.getElementById("totalHospedes").innerText = "---";
-        }
-
-        if (resQuartos.ok) {
-            const quartos = await resQuartos.json();
-            const livres = quartos.filter(q => {
-                const status = q.estado ? q.estado.toLowerCase() : "";
-                return status === "disponivel" || status === "disponível";
-            });
-            document.getElementById("totalQuartosLivres").innerText = livres.length;
-        } else {
-            document.getElementById("totalQuartosLivres").innerText = "---";
-        }
-
-    } catch (erro) {
-        console.error("Erro ao carregar dados dinâmicos do painel:", erro);
-        document.getElementById("totalReservas").innerText = "Erro";
-        document.getElementById("totalHospedes").innerText = "Erro";
-        document.getElementById("totalQuartosLivres").innerText = "Erro";
-    }
+		document.getElementById('totalReservas').innerText = reservas.length;
+		document.getElementById('totalHospedes').innerText = hospedes.length;
+		document.getElementById('totalQuartosLivres').innerText = quartosLivres.length;
+		document.getElementById('totalFuncionarios').innerText = funcionarios.length;
+		document.getElementById('resumoSistema').innerText =
+			`Sistema carregado com ${reservas.length} reserva(s), ${hospedes.length} hóspede(s), ` +
+			`${quartos.length} quarto(s), ${funcionarios.length} funcionário(s) e ${dinheiro(totalRecebido)} recebido(s).`;
+	} catch (erro) {
+		console.error(erro);
+		document.getElementById('resumoSistema').innerText = 'Não foi possível carregar o resumo do sistema.';
+	}
 }
 
 function inicializarSessaoUsuario() {
-    const nomeUsuarioSessao = localStorage.getItem("nomeUsuario") || sessionStorage.getItem("nomeUsuario");
-    const h1BoasVindas = document.getElementById("boasVindas");
-    
-    if (h1BoasVindas) {
-        if (nomeUsuarioSessao && nomeUsuarioSessao !== "1") {
-            h1BoasVindas.innerText = `Bem-vindo, ${nomeUsuarioSessao}`;
-        } else {
-            h1BoasVindas.innerText = "Bem-vindo ao Painel";
-        }
-    }
+	const usuario = usuarioLogado();
+	const h1 = document.getElementById('boasVindas');
+
+	if (usuario?.nome) {
+		h1.innerText = `Bem-vindo, ${usuario.nome}`;
+	}
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    inicializarSessaoUsuario();
-    carregarDadosDashboard();
+document.addEventListener('DOMContentLoaded', () => {
+	inicializarSessaoUsuario();
+	carregarDadosDashboard();
 });

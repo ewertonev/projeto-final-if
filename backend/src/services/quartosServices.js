@@ -1,4 +1,5 @@
 import { QuartoDao } from '../repository/quartosDao.js';
+import { ConsultasQuartosService } from './consultasQuartosServices.js';
 import { estadoValido } from '../validators/estados.js';
 import { inteiroPositivo } from '../validators/numeros.js';
 import { stringObrigatoria } from '../validators/textos.js';
@@ -8,6 +9,7 @@ const ESTADOS_QUARTO = ['disponivel', 'manutencao', 'limpeza', 'desativado'];
 export class QuartosService {
 	constructor() {
 		this.dao = new QuartoDao();
+		this.consultas = new ConsultasQuartosService();
 	}
 
 	listar(disponiveis) {
@@ -28,6 +30,10 @@ export class QuartosService {
 			data.id_tipo_quarto,
 			'ID do tipo de quarto',
 		);
+
+		if (data.estado !== undefined) {
+			data.estado = estadoValido(data.estado, ESTADOS_QUARTO, 'Estado do quarto');
+		}
 
 		return this.dao.setQuarto(data);
 	}
@@ -55,6 +61,18 @@ export class QuartosService {
 		}
 
 		return this.dao.updateQuarto(data);
+	}
+
+	intervalosAPartirDeHoje(query) {
+		return this.consultas.listarIntervalosAPartirDe(query);
+	}
+
+	intervalosAPartirDeData(query) {
+		return this.consultas.listarIntervalosAPartirDe(query);
+	}
+
+	disponiveisNoIntervalo(query) {
+		return this.consultas.listarDisponiveisNoIntervalo(query);
 	}
 
 	deletar(id) {

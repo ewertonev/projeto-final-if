@@ -1,1 +1,101 @@
-<html><head><title>Funcionários</title></head><body><h1>Funcionários</h1><p>Página criada para completar navegação.</p></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Funcionários - Hotel Prime</title>
+	<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+	<div class="layout">
+		<aside class="sidebar">
+			<div class="logo-menu">Hotel Prime</div>
+			<nav class="menu">
+				<a href="dashboard.html">Dashboard</a>
+				<a href="reservas.html">Reservas</a>
+				<a href="hospedes.html">Hóspedes</a>
+				<a href="quartos.html">Quartos</a>
+				<a href="financeiro.html">Financeiro</a>
+				<a href="funcionarios.html" class="ativo">Funcionários</a>
+				<button type="button" onclick="sair()">Sair</button>
+			</nav>
+		</aside>
+
+		<main class="conteudo">
+			<div class="topo">
+				<div>
+					<h1>Funcionários</h1>
+					<p>Todo funcionário tem acesso total ao sistema, inclusive para cadastrar outros funcionários.</p>
+				</div>
+				<button class="btn" id="btnNovoFuncionario">Novo Funcionário</button>
+			</div>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Nome</th>
+						<th>Email</th>
+						<th>Telefone</th>
+						<th>Nascimento</th>
+						<th>Status</th>
+						<th>Ações</th>
+					</tr>
+				</thead>
+				<tbody id="tabelaFuncionarios">
+					<tr><td colspan="6">Carregando funcionários...</td></tr>
+				</tbody>
+			</table>
+		</main>
+	</div>
+
+	<div id="modalFuncionario" class="modal">
+		<div class="modal-conteudo">
+			<h2 id="tituloModalFuncionario">Cadastrar Funcionário</h2>
+			<form id="formFuncionario">
+				<input type="hidden" id="idFuncionario">
+
+				<div class="form-group">
+					<label for="nomeFuncionario">Nome completo</label>
+					<input type="text" id="nomeFuncionario" required>
+				</div>
+
+				<div class="form-group">
+					<label for="emailFuncionario">E-mail</label>
+					<input type="email" id="emailFuncionario">
+				</div>
+
+				<div class="form-group">
+					<label for="telefoneFuncionario">Telefone</label>
+					<input type="text" id="telefoneFuncionario" placeholder="82999998888">
+				</div>
+
+				<div class="form-group">
+					<label for="dataNascimentoFuncionario">Data de nascimento</label>
+					<input type="date" id="dataNascimentoFuncionario" required>
+				</div>
+
+				<div class="form-group">
+					<label for="senhaFuncionario">Senha</label>
+					<input type="password" id="senhaFuncionario" placeholder="Obrigatória ao cadastrar; opcional ao editar">
+				</div>
+
+				<div class="form-group">
+					<label for="ativoFuncionario">Status</label>
+					<select id="ativoFuncionario">
+						<option value="true">Ativo</option>
+						<option value="false">Inativo</option>
+					</select>
+				</div>
+
+				<div class="botoes-modal">
+					<button type="button" class="btn-cancelar" id="btnFecharModalFuncionario">Cancelar</button>
+					<button type="submit" class="btn-salvar">Salvar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script src="../js/api.js"></script>
+	<script src="../js/funcionarios.js"></script>
+</body>
+</html>

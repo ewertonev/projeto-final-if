@@ -1,140 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard - Hotel</title>
-
-    <link rel="stylesheet" href="../css/style.css">
-
-    <style>
-        body{
-            display:flex;
-            margin: 0;
-            font-family: sans-serif;
-        }
-
-        .sidebar{
-            width:220px;
-            min-height:100vh;
-            background:#2d2a5e;
-            color:white;
-        }
-
-        .logo-menu{
-            padding:20px;
-            font-size:22px;
-            font-weight:bold;
-            text-align:center;
-        }
-
-        .menu a{
-            display:block;
-            color:white;
-            text-decoration:none;
-            padding:15px 20px;
-        }
-
-        .menu a:hover{
-            background:#403c7d;
-        }
-
-        .ativo {
-            background:#403c7d;
-        }
-
-        .conteudo{
-            flex:1;
-            padding:30px;
-            background:#f5f5f5;
-        }
-
-        .topo{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:30px;
-        }
-
-        .perfil{
-            background:white;
-            padding:10px 20px;
-            border-radius:5px;
-        }
-
-        .cards{
-            display:grid;
-            grid-template-columns:repeat(3,1fr);
-            gap:20px;
-        }
-
-        .card-info{
-            background:white;
-            padding:20px;
-            border-radius:10px;
-            box-shadow:0 0 5px rgba(0,0,0,.1);
-            color: #555;
-            font-weight: bold;
-        }
-
-        .numero{
-            font-size:32px; 
-            font-weight:bold;
-            margin-top:10px;
-            color: #2d2a5e;
-        }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dashboard - Hotel Prime</title>
+	<link rel="stylesheet" href="../css/style.css">
 </head>
-
 <body>
+	<div class="layout">
+		<aside class="sidebar">
+			<div class="logo-menu">Hotel Prime</div>
+			<nav class="menu">
+				<a href="dashboard.html" class="ativo">Dashboard</a>
+				<a href="reservas.html">Reservas</a>
+				<a href="hospedes.html">Hóspedes</a>
+				<a href="quartos.html">Quartos</a>
+				<a href="financeiro.html">Financeiro</a>
+				<a href="funcionarios.html">Funcionários</a>
+				<button type="button" onclick="sair()">Sair</button>
+			</nav>
+		</aside>
 
-<div class="sidebar">
+		<main class="conteudo">
+			<div class="topo">
+				<h1 id="boasVindas">Bem-vindo ao Painel</h1>
+				<div class="perfil">Funcionário: acesso total</div>
+			</div>
 
-    <div class="logo-menu">
-        Hotel
-    </div>
+			<section class="cards">
+				<div class="card-info">Reservas<div class="numero" id="totalReservas">0</div></div>
+				<div class="card-info">Hóspedes<div class="numero" id="totalHospedes">0</div></div>
+				<div class="card-info">Quartos Livres<div class="numero" id="totalQuartosLivres">0</div></div>
+				<div class="card-info">Funcionários<div class="numero" id="totalFuncionarios">0</div></div>
+			</section>
 
-    <div class="menu">
-        <a href="dashboard.html" class="ativo">Dashboard</a>
-        <a href="reservas.html">Reservas</a>
-        <a href="hospedes.html">Hóspedes</a>
-        <a href="quartos.html">Quartos</a>
-        <a href="funcionarios.html">Funcionários</a>
-    </div>
+			<section class="painel">
+				<h2>Resumo</h2>
+				<p id="resumoSistema" style="margin-top: 10px;">Carregando dados do sistema...</p>
+			</section>
+		</main>
+	</div>
 
-</div>
-
-<div class="conteudo">
-
-    <div class="topo">
-        <h1 id="boasVindas">Carregando...</h1>
-
-        <div class="perfil">
-            Perfil
-        </div>
-    </div>
-
-    <div class="cards">
-
-        <div class="card-info">
-            Reservas
-            <div class="numero" id="totalReservas">0</div>
-        </div>
-
-        <div class="card-info">
-            Hóspedes
-            <div class="numero" id="totalHospedes">0</div>
-        </div>
-
-        <div class="card-info">
-            Quartos Livres
-            <div class="numero" id="totalQuartosLivres">0</div>
-        </div>
-
-    </div>
-
-</div>
-
-<script src="../js/dashboard.js"></script>
-
+	<script src="../js/api.js"></script>
+	<script src="../js/dashboard.js"></script>
 </body>
 </html>

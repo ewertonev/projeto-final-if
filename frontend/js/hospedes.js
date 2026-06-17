@@ -1,109 +1,117 @@
-const API = "http://localhost:8080";
+let hospedes = [];
 
-async function carregarHospedes() {
-    try {
-        const resposta = await fetch(`${API}/hospedes`);
-        
-        if (!resposta.ok) {
-            throw new Error("Erro ao buscar dados do servidor.");
-        }
-
-        const hospedes = await resposta.json();
-        const tabela = document.getElementById("tabelaHospedes");
-        
-        if (!tabela) return;
-        tabela.innerHTML = "";
-
-        hospedes.forEach(hospede => {
-            const dataFormatada = hospede.data_nascimento 
-                ? new Date(hospede.data_nascimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) 
-                : "---";
-
-            tabela.innerHTML += `
-                <tr>
-                    <td>${hospede.nome}</td>
-                    <td>${hospede.email || "---"}</td>
-                    <td>${hospede.telefone || "---"}</td>
-                    <td>${dataFormatada}</td>
-                </tr>
-            `;
-        });
-
-    } catch (erro) {
-        console.error("Erro na comunicação GET:", erro);
-        const tabela = document.getElementById("tabelaHospedes");
-        if (tabela) {
-            tabela.innerHTML = `
-                <tr>
-                    <td colspan="4" style="color: red; text-align: center;">
-                        Não foi possível carregar a lista de hóspedes.
-                    </td>
-                </tr>
-            `;
-        }
-    }
+function limparFormularioHospede() {
+	document.getElementById('formHospede').reset();
+	document.getElementById('idHospede').value = '';
+	document.getElementById('tituloModalHospede').innerText = 'Cadastrar Hóspede';
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    
-    carregarHospedes();
+async function carregarHospedes() {
+	const tabela = document.getElementById('tabelaHospedes');
 
-    const modal = document.getElementById("modalHospede");
-    const btnNovoHospede = document.getElementById("btnNovoHospede");
-    const btnFecharModal = document.getElementById("btnFecharModal");
-    const formHospede = document.getElementById("formHospede");
+	try {
+		hospedes = await api('/hospedes');
 
-    if (btnNovoHospede && modal) {
-        btnNovoHospede.addEventListener("click", () => {
-            modal.style.display = "flex";
-        });
-    }
+		if (hospedes.length === 0) {
+			tabela.innerHTML = '<tr><td colspan="5">Nenhum hóspede cadastrado.</td></tr>';
+			return;
+		}
 
-    if (btnFecharModal && modal) {
-        btnFecharModal.addEventListener("click", () => {
-            modal.style.display = "none";
-            formHospede.reset();
-        });
-    }
+		tabela.innerHTML = hospedes.map((hospede) => `
+			<tr>
+				<td>${escaparHtml(hospede.nome)}</td>
+				<td>${escaparHtml(hospede.email)}</td>
+				<td>${escaparHtml(hospede.telefone)}</td>
+				<td>${formatarData(hospede.data_nascimento)}</td>
+				<td>
+					<div class="acoes">
+						<button type="button" class="btn-secundario" data-editar="${hospede.id}">Editar</button>
+						<button type="button" class="btn-perigo" data-excluir="${hospede.id}">Excluir</button>
+					</div>
+				</td>
+			</tr>
+		`).join('');
+	} catch (erro) {
+		console.error(erro);
+		tabela.innerHTML = '<tr><td colspan="5" style="color: red;">Não foi possível carregar os hóspedes.</td></tr>';
+	}
+}
 
-    if (formHospede) {
-        formHospede.addEventListener("submit", async (e) => {
-            e.preventDefault();
+function editarHospede(id) {
+	const hospede = hospedes.find((item) => Number(item.id) === Number(id));
+	if (!hospede) return;
 
-            const dadosHospede = {
-                nome: document.getElementById("nomeHospede").value,
-                email: document.getElementById("emailHospede").value || null,
-                telefone: document.getElementById("telefoneHospede").value || null,
-                data_nascimento: document.getElementById("dataNascimentoHospede").value
-            };
+	document.getElementById('idHospede').value = hospede.id;
+	document.getElementById('nomeHospede').value = hospede.nome || '';
+	document.getElementById('emailHospede').value = hospede.email || '';
+	document.getElementById('telefoneHospede').value = hospede.telefone || '';
+	document.getElementById('dataNascimentoHospede').value = dataParaInput(hospede.data_nascimento);
+	document.getElementById('tituloModalHospede').innerText = 'Editar Hóspede';
+	abrirModal('modalHospede');
+}
 
-            if (!dadosHospede.email && !dadosHospede.telefone) {
-                alert("Obrigatório informar pelo menos o E-mail ou o Telefone do hóspede.");
-                return;
-            }
+async function excluirHospede(id) {
+	if (!confirm('Deseja excluir este hóspede?')) return;
 
-            try {
-                const resposta = await fetch(`${API}/hospedes`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(dadosHospede)
-                });
+	try {
+		await api(`/hospedes/${id}`, { method: 'DELETE' });
+		await carregarHospedes();
+	} catch (erro) {
+		alert(erro.message);
+	}
+}
 
-                if (resposta.ok) {
-                    alert("Hóspede cadastrado com sucesso!");
-                    modal.style.display = "none";
-                    formHospede.reset();
-                    carregarHospedes();
-                } else {
-                    const respostaErro = await resposta.json().catch(() => ({}));
-                    alert(respostaErro.mensagem || "Erro ao salvar o hóspede no servidor.");
-                }
-            } catch (erro) {
-                console.error("Erro na comunicação POST:", erro);
-                alert("Não foi possível conectar ao backend.");
-            }
-        });
-    }
+async function salvarHospede(evento) {
+	evento.preventDefault();
+
+	const id = document.getElementById('idHospede').value;
+	const dados = {
+		nome: document.getElementById('nomeHospede').value.trim(),
+		email: document.getElementById('emailHospede').value.trim() || null,
+		telefone: document.getElementById('telefoneHospede').value.trim() || null,
+		data_nascimento: document.getElementById('dataNascimentoHospede').value,
+	};
+
+	if (!dados.email && !dados.telefone) {
+		alert('Informe pelo menos e-mail ou telefone.');
+		return;
+	}
+
+	try {
+		if (id) {
+			await enviarJson(`/hospedes/${id}`, 'PUT', dados);
+		} else {
+			await enviarJson('/hospedes', 'POST', dados);
+		}
+
+		fecharModal('modalHospede');
+		limparFormularioHospede();
+		await carregarHospedes();
+	} catch (erro) {
+		alert(erro.message);
+	}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+	carregarHospedes();
+
+	document.getElementById('btnNovoHospede').addEventListener('click', () => {
+		limparFormularioHospede();
+		abrirModal('modalHospede');
+	});
+
+	document.getElementById('btnFecharModalHospede').addEventListener('click', () => {
+		fecharModal('modalHospede');
+		limparFormularioHospede();
+	});
+
+	document.getElementById('formHospede').addEventListener('submit', salvarHospede);
+
+	document.getElementById('tabelaHospedes').addEventListener('click', (evento) => {
+		const editar = evento.target.dataset.editar;
+		const excluir = evento.target.dataset.excluir;
+
+		if (editar) editarHospede(editar);
+		if (excluir) excluirHospede(excluir);
+	});
 });

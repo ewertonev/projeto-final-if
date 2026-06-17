@@ -1,188 +1,202 @@
-// src/dao/funcionariosDao.js
 import { BaseDao } from './baseDao.js';
 
 export class FuncionarioDao extends BaseDao {
-    consultarFuncionarios(params = '') {
-        return `
-            SELECT
-                f.*,
-                COALESCE(
-                    JSON_ARRAYAGG(
-                        CASE
-                            WHEN p.nome IS NOT NULL
-                            THEN
-                                JSON_OBJECT(
-                                    'id', p.id,
-                                    'nome',p.nome
-                                )
-                        END
-                    ),
-                JSON_ARRAY()
-            ) AS papeis
+	consultaBase(where = '') {
+		return `
+			SELECT
+				id,
+				nome,
+				email,
+				telefone,
+				data_nascimento,
+				ativo,
+				data_criacao
+			FROM funcionarios
+			${where}
+			ORDER BY nome
+		`;
+	}
 
-            FROM funcionarios AS f
+	async getFuncionarios(ativos) {
+		let where = '';
 
-            LEFT JOIN funcionarios_papeis AS fp
-                ON fp.id_funcionario = f.id
+		if (ativos === true) {
+			where = 'WHERE ativo = TRUE';
+		} else if (ativos === false) {
+			where = 'WHERE ativo = FALSE';
+		}
 
-            LEFT JOIN papeis AS p
-                ON fp.id_papel = p.id
-            
-            ${params}
-            GROUP BY f.id
-            `;
-    }
-    async getFuncionarios(ativos) {
-        let atv = '';
-        if (ativos == true) {
-            atv = 'WHERE f.ativo = TRUE';
-        } else if (ativos == false) {
-            atv = 'WHERE f.ativo = FALSE';
-        }
-        let sql = this.consultarFuncionarios(atv);
+		const [rows] = await this.DB.query(this.consultaBase(where));
+		return rows;
+	}
 
-        let [rows] = await this.DB.query(sql);
-        return rows;
-    }
+	async getFuncionario(consulta) {
+		const { tipo, valor } = consulta;
 
-    async getFuncionario(consulta) {
-        const { tipo, valor } = consulta;
+		const camposValidos = {
+			id: 'id = ?',
+			nome: 'nome LIKE ?',
+			email: 'email LIKE ?',
+			telefone: 'telefone LIKE ?',
+			pesquisa: `
+				id = ? OR
+				nome LIKE ? OR
+				email LIKE ? OR
+				telefone LIKE ?
+			`,
+		};
 
-        let camposValidos = {
-            id: 'WHERE f.id = ?',
-            nome: 'WHERE f.nome LIKE ?',
-            email: 'WHERE f.email LIKE ?',
-            telefone: 'WHERE f.telefone LIKE ?',
-            pesquisa: `
-                WHERE
-                f.id = ? OR
-                f.nome LIKE ? OR
-                f.email LIKE ? OR
-                f.telefone LIKE ?
-                `,
-        };
+		if (!(tipo in camposValidos)) {
+			throw new Error('Campo inválido');
+		}
 
-        if (!(tipo in camposValidos)) {
-            throw new Error('Campo inválido');
-        }
+		let params = [`%${valor}%`];
 
-        let where = camposValidos[tipo];
+		if (tipo === 'pesquisa') {
+			params = [
+				Number(valor) || 0,
+				`%${valor}%`,
+				`%${valor}%`,
+				`%${valor}%`,
+			];
+		} else if (tipo === 'id') {
+			const id = Number(valor);
+			if (!Number.isInteger(id)) {
+				throw new Error('ID inválido');
+			}
+			params = [id];
+		}
 
-        const sql = this.consultarFuncionarios(where);
+		const sql = this.consultaBase(`WHERE ${camposValidos[tipo]}`);
+		const [rows] = await this.DB.execute(sql, params);
 
-        let params = [`%${valor}%`];
-        if (tipo === 'pesquisa') {
-            params = [
-                Number(valor) || 0,
-                `%${valor}%`,
-                `%${valor}%`,
-                `%${valor}%`,
-            ];
-        } else if (tipo === 'id') {
-            const id = Number(valor);
-            if (!Number.isInteger(id)) {
-                throw new Error('ID inválido');
-            }
-            params = [id];
-        }
+		if (tipo === 'id') {
+			return rows[0] || null;
+		}
 
-        const [rows] = await this.DB.execute(sql, params);
-        return rows;
-    }
+		return rows;
+	}
 
-    async setFuncionario(data) {
-        const sql = `
-        CALL add_funcionario(?, ?, ?, ?, ?, ?)
-    `;
+	async getFuncionarioParaLogin(identificador) {
+		const sql = `
+			SELECT
+				id,
+				nome,
+				email,
+				telefone,
+				senha,
+				ativo
+			FROM funcionarios
+			WHERE email = ? OR telefone = ? OR nome = ?
+			LIMIT 1
+		`;
 
-        const [result] = await this.DB.query(sql, [
-            data.nome,
-            data.email || null,
-            data.telefone || null,
-            data.senha,
-            data.data_nascimento,
-            JSON.stringify(data.papeis ?? []),
-        ]);
+		const [rows] = await this.DB.execute(sql, [
+			identificador,
+			identificador,
+			identificador,
+		]);
 
-        return result[0][0].id;
-    }
+		return rows[0] || null;
+	}
 
-    async updateFuncionarioPapeis(id, papeis) {
-        const sql = `CALL update_funcionario(?, ?)`;
+	async atualizarSenhaHash(id, senhaHash) {
+		await this.DB.execute(
+			`
+				UPDATE funcionarios
+				SET senha = ?
+				WHERE id = ?
+			`,
+			[senhaHash, id],
+		);
+	}
 
-        const [result] = await this.DB.query(sql, [
-            id,
-            JSON.stringify(papeis ?? []),
-        ]);
+	async setFuncionario(data) {
+		const sql = `
+			INSERT INTO funcionarios (
+				nome,
+				email,
+				telefone,
+				senha,
+				data_nascimento,
+				ativo
+			)
+			VALUES (?, ?, ?, ?, ?, ?)
+		`;
 
-        return result;
-    }
+		const [result] = await this.DB.execute(sql, [
+			data.nome,
+			data.email || null,
+			data.telefone || null,
+			data.senha,
+			data.data_nascimento,
+			data.ativo ?? true,
+		]);
 
-    async updateFuncionario(data) {
-        const campos = [];
-        const valores = [];
+		return result.insertId;
+	}
 
-        if (data.nome !== undefined) {
-            campos.push('nome = ?');
-            valores.push(data.nome);
-        }
+	async updateFuncionario(data) {
+		const campos = [];
+		const valores = [];
 
-        if (data.email !== undefined) {
-            campos.push('email = ?');
-            valores.push(data.email);
-        }
+		if (data.nome !== undefined) {
+			campos.push('nome = ?');
+			valores.push(data.nome);
+		}
 
-        if (data.telefone !== undefined) {
-            campos.push('telefone = ?');
-            valores.push(data.telefone);
-        }
-        if (data.senha !== undefined) {
-            campos.push('senha = ?');
-            valores.push(data.senha);
-        }
+		if (data.email !== undefined) {
+			campos.push('email = ?');
+			valores.push(data.email || null);
+		}
 
-        if (data.data_nascimento !== undefined) {
-            campos.push('data_nascimento = ?');
-            valores.push(data.data_nascimento);
-        }
+		if (data.telefone !== undefined) {
+			campos.push('telefone = ?');
+			valores.push(data.telefone || null);
+		}
 
-        if (data.ativo !== undefined) {
-            campos.push('ativo = ?');
-            valores.push(data.ativo);
-        }
+		if (data.senha !== undefined) {
+			campos.push('senha = ?');
+			valores.push(data.senha);
+		}
 
-        if (campos.length === 0 && data.papeis === undefined) {
-            return false;
-        }
+		if (data.data_nascimento !== undefined) {
+			campos.push('data_nascimento = ?');
+			valores.push(data.data_nascimento);
+		}
 
-        valores.push(data.id);
+		if (data.ativo !== undefined) {
+			campos.push('ativo = ?');
+			valores.push(data.ativo);
+		}
 
-        if (campos.length > 0) {
-            await this.DB.execute(
-                `
-                UPDATE funcionarios
-                SET ${campos.join(', ')}
-                WHERE id = ?
-                `,
-                valores,
-            );
-        }
+		if (campos.length === 0) {
+			return false;
+		}
 
-        if (data.papeis !== undefined) {
-            await this.updateFuncionarioPapeis(data.id, data.papeis);
-        }
+		valores.push(data.id);
 
-        return true;
-    }
+		const [result] = await this.DB.execute(
+			`
+				UPDATE funcionarios
+				SET ${campos.join(', ')}
+				WHERE id = ?
+			`,
+			valores,
+		);
 
-    async deleteFuncionario(id) {
-        const sql = `
-            DELETE FROM funcionarios
-            WHERE id = ?
-    `;
+		return result.affectedRows > 0;
+	}
 
-        const [result] = await this.DB.execute(sql, [id]);
+	async deleteFuncionario(id) {
+		const [result] = await this.DB.execute(
+			`
+				DELETE FROM funcionarios
+				WHERE id = ?
+			`,
+			[id],
+		);
 
-        return result.affectedRows > 0;
-    }
+		return result.affectedRows > 0;
+	}
 }

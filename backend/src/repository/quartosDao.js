@@ -99,15 +99,17 @@ export class QuartoDao extends BaseDao {
             INSERT INTO quartos (
                 numero,
                 andar,
-                id_tipo_quarto
+                id_tipo_quarto,
+                estado
             )
-            VALUES (?, ?, ?)
+            VALUES (?, ?, ?, ?)
         `;
 
 		const [result] = await this.DB.execute(sql, [
 			data.numero,
 			data.andar,
 			data.id_tipo_quarto,
+			data.estado || 'disponivel',
 		]);
 
 		return result.insertId;

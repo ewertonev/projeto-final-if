@@ -1,24 +1,27 @@
-function entrar(){
+async function entrar() {
+	const usuario = document.getElementById('usuario').value.trim();
+	const senha = document.getElementById('senha').value.trim();
 
-    const usuario =
-        document.getElementById("usuario").value;
+	if (usuario === '' || senha === '') {
+		alert('Preencha funcionário e senha.');
+		return;
+	}
 
-    const senha =
-        document.getElementById("senha").value;
+	try {
+		const resposta = await enviarJson('/auth/login', 'POST', {
+			usuario,
+			senha,
+		});
 
-    if(usuario === "" || senha === ""){
-        alert("Preencha os campos");
-        return;
-    }
-
-    localStorage.setItem(
-        "usuario",
-        JSON.stringify({
-            nome: usuario,
-            cargo: "Gerente"
-        })
-    );
-
-    window.location.href =
-        "pages/dashboard.html";
+		localStorage.setItem('usuario', JSON.stringify(resposta.usuario));
+		window.location.href = 'pages/dashboard.html';
+	} catch (erro) {
+		alert(erro.message);
+	}
 }
+
+document.addEventListener('keydown', (evento) => {
+	if (evento.key === 'Enter') {
+		entrar();
+	}
+});

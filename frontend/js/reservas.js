@@ -1,129 +1,145 @@
-const API = "http://localhost:8080";
+let reservas = [];
+let hospedes = [];
+let quartos = [];
+
+function limparFormularioReserva() {
+	document.getElementById('formReserva').reset();
+	document.getElementById('idReserva').value = '';
+	document.getElementById('estadoReserva').value = 'confirmada';
+	document.getElementById('qtdHospedes').value = 1;
+	document.getElementById('tituloModalReserva').innerText = 'Criar Reserva';
+}
+
+async function carregarOpcoesReserva() {
+	[hospedes, quartos] = await Promise.all([
+		api('/hospedes?ativos=true'),
+		api('/quartos'),
+	]);
+
+	document.getElementById('selectHospede').innerHTML = hospedes.map((hospede) => `
+		<option value="${hospede.id}">${escaparHtml(hospede.nome)}</option>
+	`).join('');
+
+	document.getElementById('selectQuarto').innerHTML = quartos.map((quarto) => `
+		<option value="${quarto.id}">Quarto ${escaparHtml(quarto.numero)} - ${escaparHtml(quarto.tipo_quarto)} - ${escaparHtml(quarto.estado)}</option>
+	`).join('');
+}
 
 async function carregarReservas() {
-    try {
-        const resposta = await fetch(`${API}/reservas`);
-        if (!resposta.ok) throw new Error("Erro ao buscar reservas.");
+	const tabela = document.getElementById('tabelaReservas');
 
-        const reservas = await resposta.json();
-        const tabela = document.getElementById("tabelaReservas");
-        if (!tabela) return;
-        tabela.innerHTML = "";
+	try {
+		reservas = await api('/reservas');
 
-        reservas.forEach(reserva => {
-            const dataInicio = new Date(reserva.inicio).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-            const dataFim = new Date(reserva.fim).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-            
-            const nomeHospede = reserva.nome_hospede || `Hóspede ID: ${reserva.id_hospede}`;
-            const numQuarto = reserva.numero_quarto || `Quarto ID: ${reserva.id_quarto}`;
+		if (reservas.length === 0) {
+			tabela.innerHTML = '<tr><td colspan="7">Nenhuma reserva cadastrada.</td></tr>';
+			return;
+		}
 
-            tabela.innerHTML += `
-                <tr>
-                    <td>${nomeHospede}</td>
-                    <td>${numQuarto}</td>
-                    <td>${dataInicio}</td>
-                    <td>${dataFim}</td>
-                    <td>${reserva.quantidade_hospedes}</td>
-                    <td><span class="status-${reserva.estado}">${reserva.estado}</span></td>
-                </tr>
-            `;
-        });
-    } catch (erro) {
-        console.error("Erro no GET de reservas:", erro);
-        const tabela = document.getElementById("tabelaReservas");
-        if (tabela) tabela.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Erro ao listar reservas.</td></tr>`;
-    }
+		tabela.innerHTML = reservas.map((reserva) => `
+			<tr>
+				<td>${escaparHtml(reserva.hospede_nome)}</td>
+				<td>${escaparHtml(reserva.numero_quarto)} - ${escaparHtml(reserva.tipo_quarto)}</td>
+				<td>${formatarData(reserva.inicio)}</td>
+				<td>${formatarData(reserva.fim)}</td>
+				<td>${escaparHtml(reserva.quantidade_hospedes)}</td>
+				<td><span class="status-${reserva.estado}">${escaparHtml(reserva.estado)}</span></td>
+				<td>
+					<div class="acoes">
+						<button type="button" class="btn-secundario" data-editar="${reserva.id}">Editar</button>
+						<button type="button" class="btn-perigo" data-excluir="${reserva.id}">Excluir</button>
+					</div>
+				</td>
+			</tr>
+		`).join('');
+	} catch (erro) {
+		console.error(erro);
+		tabela.innerHTML = '<tr><td colspan="7" style="color: red;">Não foi possível carregar as reservas.</td></tr>';
+	}
 }
 
-async function carregarOpcoesFormulario() {
-    try {
-        const [resHospedes, resQuartos] = await Promise.all([
-            fetch(`${API}/hospedes`),
-            fetch(`${API}/quartos`)
-        ]);
+async function editarReserva(id) {
+	const reserva = reservas.find((item) => Number(item.id) === Number(id));
+	if (!reserva) return;
 
-        if (resHospedes.ok) {
-            const hospedes = await resHospedes.json();
-            const selectHospede = document.getElementById("selectHospede");
-            if (selectHospede) {
-                selectHospede.innerHTML = '<option value="">Selecione um Hóspede</option>';
-                hospedes.forEach(h => selectHospede.innerHTML += `<option value="${h.id}">${h.nome}</option>`);
-            }
-        }
+	await carregarOpcoesReserva();
 
-        if (resQuartos.ok) {
-            const quartos = await resQuartos.json();
-            const selectQuarto = document.getElementById("selectQuarto");
-            if (selectQuarto) {
-                selectQuarto.innerHTML = '<option value="">Selecione um Quarto'
-                quartos.forEach(q => {
-                    if (q.estado === 'disponivel' || q.estado === 'disponível') {
-                        selectQuarto.innerHTML += `<option value="${q.id}">Quarto ${q.numero}</option>`;
-                    }
-                });
-            }
-        }
-    } catch (erro) {
-        console.error("Erro ao carregar opções para o formulário:", erro);
-    }
+	document.getElementById('idReserva').value = reserva.id;
+	document.getElementById('selectHospede').value = reserva.id_hospede;
+	document.getElementById('selectQuarto').value = reserva.id_quarto;
+	document.getElementById('dataInicio').value = dataParaInput(reserva.inicio);
+	document.getElementById('dataFim').value = dataParaInput(reserva.fim);
+	document.getElementById('qtdHospedes').value = reserva.quantidade_hospedes;
+	document.getElementById('estadoReserva').value = reserva.estado || 'confirmada';
+	document.getElementById('tituloModalReserva').innerText = 'Editar Reserva';
+	abrirModal('modalReserva');
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    carregarReservas();
+async function excluirReserva(id) {
+	if (!confirm('Deseja excluir esta reserva?')) return;
 
-    const modal = document.getElementById("modalReserva");
-    const btnNovaReserva = document.getElementById("btnNovaReserva");
-    const btnFecharModal = document.getElementById("btnFecharModal");
-    const formReserva = document.getElementById("formReserva");
+	try {
+		await api(`/reservas/${id}`, { method: 'DELETE' });
+		await carregarReservas();
+	} catch (erro) {
+		alert(erro.message);
+	}
+}
 
-    if (btnNovaReserva && modal) {
-        btnNovaReserva.addEventListener("click", () => {
-            modal.style.display = "flex";
-            carregarOpcoesFormulario(); 
-            }
-        )
-    }
+async function salvarReserva(evento) {
+	evento.preventDefault();
 
-    if (btnFecharModal && modal) {
-        btnFecharModal.addEventListener("click", () => {
-            modal.style.display = "none";
-            formReserva.reset();
-        });
-    }
+	const id = document.getElementById('idReserva').value;
+	const dados = {
+		id_hospede: Number(document.getElementById('selectHospede').value),
+		id_quarto: Number(document.getElementById('selectQuarto').value),
+		inicio: document.getElementById('dataInicio').value,
+		fim: document.getElementById('dataFim').value,
+		quantidade_hospedes: Number(document.getElementById('qtdHospedes').value),
+		estado: document.getElementById('estadoReserva').value,
+	};
 
-    if (formReserva) {
-        formReserva.addEventListener("submit", async (e) => {
-            e.preventDefault();
+	try {
+		if (id) {
+			await enviarJson(`/reservas/${id}`, 'PUT', dados);
+		} else {
+			delete dados.estado;
+			await enviarJson('/reservas', 'POST', dados);
+		}
 
-            const dadosReserva = {
-                id_hospede: Number(document.getElementById("selectHospede").value),
-                id_quarto: Number(document.getElementById("selectQuarto").value),
-                inicio: document.getElementById("dataInicio").value,
-                fim: document.getElementById("dataFim").value,
-                quantidade_hospedes: Number(document.getElementById("qtdHospedes").value),
-                estado: "confirmada" 
-            };
+		fecharModal('modalReserva');
+		limparFormularioReserva();
+		await carregarReservas();
+	} catch (erro) {
+		alert(erro.message);
+	}
+}
 
-            try {
-                const resposta = await fetch(`${API}/reservas`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(dadosReserva)
-                });
+document.addEventListener('DOMContentLoaded', () => {
+	carregarReservas();
 
-                if (resposta.ok) {
-                    alert("Reserva efetuada com sucesso!");
-                    modal.style.display = "none";
-                    formReserva.reset();
-                    carregarReservas();
-                } else {
-                    const erroServidor = await resposta.json().catch(() => ({}));
-                    alert(erroServidor.mensagem || "Erro ao salvar reserva. Verifique as datas.");
-                }
-            } catch (erro) {
-                console.error("Erro no POST de reservas:", erro);
-                alert("Não foi possível conectar ao servidor.");
-            }
-        });
-    }
+	document.getElementById('btnNovaReserva').addEventListener('click', async () => {
+		try {
+			limparFormularioReserva();
+			await carregarOpcoesReserva();
+			abrirModal('modalReserva');
+		} catch (erro) {
+			alert('Cadastre hóspedes e quartos antes de criar uma reserva.');
+		}
+	});
+
+	document.getElementById('btnFecharModalReserva').addEventListener('click', () => {
+		fecharModal('modalReserva');
+		limparFormularioReserva();
+	});
+
+	document.getElementById('formReserva').addEventListener('submit', salvarReserva);
+
+	document.getElementById('tabelaReservas').addEventListener('click', (evento) => {
+		const editar = evento.target.dataset.editar;
+		const excluir = evento.target.dataset.excluir;
+
+		if (editar) editarReserva(editar);
+		if (excluir) excluirReserva(excluir);
+	});
 });

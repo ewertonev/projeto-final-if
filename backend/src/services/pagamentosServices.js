@@ -14,6 +14,11 @@ export class PagamentosService {
 		return this.dao.getPagamentos();
 	}
 
+	listarPorReserva(idReserva) {
+		idReserva = inteiroPositivo(idReserva, 'ID da reserva');
+		return this.dao.getPagamentosPorReserva(idReserva);
+	}
+
 	buscar(consulta) {
 		consulta.tipo = stringObrigatoria(consulta.tipo, 'Tipo');
 		consulta.valor = stringObrigatoria(String(consulta.valor), 'Valor');
