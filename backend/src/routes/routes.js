@@ -1,5 +1,5 @@
 import { Router } from 'express';
-
+import pool from '../../config/conexao.js';
 import { HospedesController } from '../controller/hospedesController.js';
 import { TiposQuartosController } from '../controller/tiposQuartosController.js';
 import { QuartosController } from '../controller/quartosController.js';
@@ -98,4 +98,4 @@ routes.post('/consumos', ConsumosController.criar);
 routes.put('/consumos/:id', ConsumosController.atualizar);
 routes.delete('/consumos/:id', ConsumosController.deletar);
 
-import pool from '../../config/conexao.js';
+
