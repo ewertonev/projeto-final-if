@@ -1,0 +1,308 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	background: #f5f5f5;
+	color: #222;
+}
+
+.login-page {
+	min-height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: #f5f5f5;
+}
+
+.login-card {
+	width: 360px;
+	background: white;
+	padding: 32px;
+	border-radius: 12px;
+	box-shadow: 0 0 14px rgba(0, 0, 0, .12);
+}
+
+.logo {
+	text-align: center;
+	font-size: 28px;
+	font-weight: bold;
+	margin-bottom: 22px;
+	color: #2d2a5e;
+}
+
+.layout {
+	display: flex;
+	min-height: 100vh;
+}
+
+.sidebar {
+	width: 220px;
+	background: #2d2a5e;
+	color: white;
+	flex-shrink: 0;
+}
+
+.logo-menu {
+	padding: 20px;
+	font-size: 22px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.menu a,
+.menu button {
+	display: block;
+	width: 100%;
+	padding: 15px 20px;
+	border: 0;
+	background: transparent;
+	color: white;
+	text-align: left;
+	text-decoration: none;
+	font: inherit;
+	cursor: pointer;
+}
+
+.menu a:hover,
+.menu button:hover,
+.menu .ativo {
+	background: #403c7d;
+}
+
+.conteudo {
+	flex: 1;
+	padding: 30px;
+	background: #f5f5f5;
+	overflow-x: auto;
+}
+
+.topo {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 22px;
+}
+
+.topo h1 {
+	color: #2d2a5e;
+}
+
+.perfil {
+	background: white;
+	padding: 10px 16px;
+	border-radius: 6px;
+	box-shadow: 0 0 5px rgba(0, 0, 0, .08);
+}
+
+.cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+	gap: 18px;
+	margin-bottom: 22px;
+}
+
+.card,
+.card-info,
+.painel {
+	background: white;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 6px rgba(0, 0, 0, .10);
+}
+
+.card-info,
+.card {
+	font-weight: bold;
+	color: #555;
+}
+
+.numero {
+	font-size: 32px;
+	font-weight: bold;
+	margin-top: 10px;
+	color: #2d2a5e;
+}
+
+input,
+select,
+textarea {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font: inherit;
+}
+
+textarea {
+	resize: vertical;
+	min-height: 80px;
+}
+
+button,
+.btn,
+.btn-salvar,
+.btn-cancelar,
+.btn-perigo,
+.btn-secundario {
+	border: none;
+	border-radius: 5px;
+	padding: 10px 14px;
+	cursor: pointer;
+	font: inherit;
+}
+
+button,
+.btn,
+.btn-salvar {
+	background: #2d2a5e;
+	color: white;
+}
+
+.btn {
+	width: auto;
+}
+
+.btn-secundario,
+.btn-cancelar {
+	background: #ddd;
+	color: #222;
+}
+
+.btn-perigo {
+	background: #b00020;
+	color: white;
+}
+
+.acoes {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.acoes button {
+	padding: 7px 10px;
+	font-size: 14px;
+}
+
+table {
+	width: 100%;
+	background: white;
+	border-collapse: collapse;
+	border-radius: 8px;
+	overflow: hidden;
+	box-shadow: 0 0 6px rgba(0, 0, 0, .08);
+}
+
+th,
+td {
+	padding: 12px;
+	border-bottom: 1px solid #e5e5e5;
+	text-align: left;
+	vertical-align: top;
+}
+
+th {
+	background: #eee;
+	font-weight: bold;
+}
+
+.modal {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, .50);
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	padding: 20px;
+}
+
+.modal.aberto {
+	display: flex;
+}
+
+.modal-conteudo {
+	background: white;
+	padding: 28px;
+	border-radius: 10px;
+	width: min(520px, 100%);
+	max-height: 90vh;
+	overflow-y: auto;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, .22);
+}
+
+.modal-conteudo h2 {
+	margin-bottom: 18px;
+	color: #2d2a5e;
+}
+
+.form-group {
+	margin-bottom: 14px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 6px;
+	font-weight: bold;
+}
+
+.botoes-modal {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: 20px;
+}
+
+.mensagem {
+	padding: 12px;
+	border-radius: 6px;
+	margin-bottom: 15px;
+	background: #fff3cd;
+	color: #5c4600;
+}
+
+.status-confirmada,
+.status-disponivel,
+.status-pago,
+.status-ativo {
+	color: #116b2f;
+	font-weight: bold;
+}
+
+.status-finalizada,
+.status-limpeza,
+.status-pendente {
+	color: #1e4f9a;
+	font-weight: bold;
+}
+
+.status-cancelada,
+.status-faltou,
+.status-manutencao,
+.status-desativado,
+.status-cancelado,
+.status-inativo {
+	color: #b00020;
+	font-weight: bold;
+}
+
+@media (max-width: 760px) {
+	.layout {
+		flex-direction: column;
+	}
+
+	.sidebar {
+		width: 100%;
+		min-height: auto;
+	}
+
+	.topo {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+}

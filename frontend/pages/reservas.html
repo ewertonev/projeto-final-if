@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Reservas - Hotel Prime</title>
+	<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+	<div class="layout">
+		<aside class="sidebar">
+			<div class="logo-menu">Hotel Prime</div>
+			<nav class="menu">
+				<a href="dashboard.html">Dashboard</a>
+				<a href="reservas.html" class="ativo">Reservas</a>
+				<a href="hospedes.html">Hóspedes</a>
+				<a href="quartos.html">Quartos</a>
+				<a href="financeiro.html">Financeiro</a>
+				<a href="funcionarios.html">Funcionários</a>
+				<button type="button" onclick="sair()">Sair</button>
+			</nav>
+		</aside>
+
+		<main class="conteudo">
+			<div class="topo">
+				<h1>Reservas</h1>
+				<button class="btn" id="btnNovaReserva">Nova Reserva</button>
+			</div>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Hóspede</th>
+						<th>Quarto</th>
+						<th>Check-in</th>
+						<th>Check-out</th>
+						<th>Qtd.</th>
+						<th>Status</th>
+						<th>Ações</th>
+					</tr>
+				</thead>
+				<tbody id="tabelaReservas">
+					<tr><td colspan="7">Carregando reservas...</td></tr>
+				</tbody>
+			</table>
+		</main>
+	</div>
+
+	<div id="modalReserva" class="modal">
+		<div class="modal-conteudo">
+			<h2 id="tituloModalReserva">Criar Reserva</h2>
+			<form id="formReserva">
+				<input type="hidden" id="idReserva">
+
+				<div class="form-group">
+					<label for="selectHospede">Hóspede</label>
+					<select id="selectHospede" required></select>
+				</div>
+
+				<div class="form-group">
+					<label for="selectQuarto">Quarto</label>
+					<select id="selectQuarto" required></select>
+				</div>
+
+				<div class="form-group">
+					<label for="dataInicio">Check-in</label>
+					<input type="date" id="dataInicio" required>
+				</div>
+
+				<div class="form-group">
+					<label for="dataFim">Check-out</label>
+					<input type="date" id="dataFim" required>
+				</div>
+
+				<div class="form-group">
+					<label for="qtdHospedes">Quantidade de hóspedes</label>
+					<input type="number" id="qtdHospedes" min="1" value="1" required>
+				</div>
+
+				<div class="form-group">
+					<label for="estadoReserva">Estado</label>
+					<select id="estadoReserva" required>
+						<option value="confirmada">Confirmada</option>
+						<option value="finalizada">Finalizada</option>
+						<option value="cancelada">Cancelada</option>
+						<option value="faltou">Faltou</option>
+					</select>
+				</div>
+
+				<div class="botoes-modal">
+					<button type="button" class="btn-cancelar" id="btnFecharModalReserva">Cancelar</button>
+					<button type="submit" class="btn-salvar">Salvar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script src="../js/api.js"></script>
+	<script src="../js/reservas.js"></script>
+</body>
+</html>

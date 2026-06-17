@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Dashboard - Hotel Prime</title>
+	<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+	<div class="layout">
+		<aside class="sidebar">
+			<div class="logo-menu">Hotel Prime</div>
+			<nav class="menu">
+				<a href="dashboard.html" class="ativo">Dashboard</a>
+				<a href="reservas.html">Reservas</a>
+				<a href="hospedes.html">Hóspedes</a>
+				<a href="quartos.html">Quartos</a>
+				<a href="financeiro.html">Financeiro</a>
+				<a href="funcionarios.html">Funcionários</a>
+				<button type="button" onclick="sair()">Sair</button>
+			</nav>
+		</aside>
+
+		<main class="conteudo">
+			<div class="topo">
+				<h1 id="boasVindas">Bem-vindo ao Painel</h1>
+				<div class="perfil">Funcionário: acesso total</div>
+			</div>
+
+			<section class="cards">
+				<div class="card-info">Reservas<div class="numero" id="totalReservas">0</div></div>
+				<div class="card-info">Hóspedes<div class="numero" id="totalHospedes">0</div></div>
+				<div class="card-info">Quartos Livres<div class="numero" id="totalQuartosLivres">0</div></div>
+				<div class="card-info">Funcionários<div class="numero" id="totalFuncionarios">0</div></div>
+			</section>
+
+			<section class="painel">
+				<h2>Resumo</h2>
+				<p id="resumoSistema" style="margin-top: 10px;">Carregando dados do sistema...</p>
+			</section>
+		</main>
+	</div>
+
+	<script src="../js/api.js"></script>
+	<script src="../js/dashboard.js"></script>
+</body>
+</html>

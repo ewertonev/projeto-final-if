@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Hóspedes - Hotel Prime</title>
+	<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+	<div class="layout">
+		<aside class="sidebar">
+			<div class="logo-menu">Hotel Prime</div>
+			<nav class="menu">
+				<a href="dashboard.html">Dashboard</a>
+				<a href="reservas.html">Reservas</a>
+				<a href="hospedes.html" class="ativo">Hóspedes</a>
+				<a href="quartos.html">Quartos</a>
+				<a href="financeiro.html">Financeiro</a>
+				<a href="funcionarios.html">Funcionários</a>
+				<button type="button" onclick="sair()">Sair</button>
+			</nav>
+		</aside>
+
+		<main class="conteudo">
+			<div class="topo">
+				<h1>Hóspedes</h1>
+				<button class="btn" id="btnNovoHospede">Novo Hóspede</button>
+			</div>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Nome</th>
+						<th>Email</th>
+						<th>Telefone</th>
+						<th>Nascimento</th>
+						<th>Ações</th>
+					</tr>
+				</thead>
+				<tbody id="tabelaHospedes">
+					<tr><td colspan="5">Carregando hóspedes...</td></tr>
+				</tbody>
+			</table>
+		</main>
+	</div>
+
+	<div id="modalHospede" class="modal">
+		<div class="modal-conteudo">
+			<h2 id="tituloModalHospede">Cadastrar Hóspede</h2>
+			<form id="formHospede">
+				<input type="hidden" id="idHospede">
+
+				<div class="form-group">
+					<label for="nomeHospede">Nome completo</label>
+					<input type="text" id="nomeHospede" required>
+				</div>
+
+				<div class="form-group">
+					<label for="emailHospede">E-mail</label>
+					<input type="email" id="emailHospede">
+				</div>
+
+				<div class="form-group">
+					<label for="telefoneHospede">Telefone</label>
+					<input type="text" id="telefoneHospede" placeholder="82999998888">
+				</div>
+
+				<div class="form-group">
+					<label for="dataNascimentoHospede">Data de nascimento</label>
+					<input type="date" id="dataNascimentoHospede" required>
+				</div>
+
+				<div class="botoes-modal">
+					<button type="button" class="btn-cancelar" id="btnFecharModalHospede">Cancelar</button>
+					<button type="submit" class="btn-salvar">Salvar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script src="../js/api.js"></script>
+	<script src="../js/hospedes.js"></script>
+</body>
+</html>
